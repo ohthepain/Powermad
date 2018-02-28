@@ -1,5 +1,8 @@
 // Song.h
 
+#pragma once
+
+#include <stdint.h>
 #include <list>
 
 namespace Atomic
@@ -32,8 +35,10 @@ namespace Atomic
             Song();
             ~Song() {}
 
+            double GetTempo() { return mTempo; }
+
         private:
-            float mTempo;
+            double mTempo;
             std::list<Part> mPartList;
     };
 

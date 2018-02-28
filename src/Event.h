@@ -1,155 +1,157 @@
 // Event.h
 
+#pragma once
+
 #include <stdint.h>
 #include <functional>
-#include <stdlib.h>
-
-namespace std {
-    void __throw_bad_function_call();
-}
+#include <assert.h>
 
 namespace Atomic
 {
-  template<class T> class Vector
-  {
-      public:
-        Vector();
-        ~Vector();
-
-        void Add(T value);
-        void Remove(T value);
-        T& operator[](int index);
-        void Clear();
-        size_t GetSize() { return mSize; }
-
-      private:
-        T* mNodes;
-        size_t mSize;
-        size_t mCapacity;
-  };
-  
-	class Event
+	template<class T> class Vector
 	{
-		public:
-			typedef enum {
-				MidiNote,
-				MidiPlay,
-				MidiStop,
-				MidiContinue,
-				MillisecondClock,
-				MidiClock,
-        KeyPress,
-        RawKey,
-        ArraySize,
-			} EventType;
+	public:
+		Vector();
+		~Vector();
 
-      typedef enum {
-        Illegal,
-        Sequence,
-        TopLeft,
-        Note6,
-        Note4,
-        Note3,
-        Note2,
-        Note1,
-        Seq,
-        Note0,
-        SecondFromTopLeft,
-        IdkLeft,
-        Release,
-        Attack,
-        Button13,
-        Note7,
-        Shift,
-        Note8,
-        Gate,
-        Button18,
-        Button19,
-        Button20,
-        A,
-        Play,
-        Stop,
-        IdkRight,
-        Chase,
-        Button26,
-      } KeyId;
-		
-			typedef enum {
-				PriorityMax = 0,
-				High = 10,
-				Medium = 100,
-				Low = 1000,
-			} Priority;
+		void Add(T value);
+		void Remove(T value);
+		T& operator[](int index);
+		void Clear();
+		size_t GetSize() { return mSize; }
 
-			Event() {}
-			virtual ~Event() {}
-
-			virtual EventType GetEventType() const = 0;
+	private:
+		T* mNodes;
+		size_t mSize;
+		size_t mCapacity;
 	};
 
-  class MillisecondClockEvent : public Event
-  {
-    EventType GetEventType() const { return Event::MillisecondClock; }
-  };
+	class Event
+	{
+	public:
+		typedef enum {
+			MidiNote,
+			MidiPlay,
+			MidiStop,
+			MidiContinue,
+			MillisecondClock,
+			MidiClock,
+			KeyPress,
+			RawKey,
+			ArraySize,
+		} EventType;
 
-  class KeyPressEvent : public Event
-  {
-    public:
-      KeyPressEvent(KeyId keyId, uint8_t modifiers) : mKeyId(keyId), mModifiers(modifiers) {}
-      EventType GetEventType() const { return Event::MillisecondClock; }
-      KeyId GetKeyId() const { return mKeyId; }
-      uint8_t GetModifiers() const { return mModifiers; }
-    private:
-      KeyId mKeyId;
-      uint8_t mModifiers;
-  };
+		typedef enum {
+			Illegal,
+			Sequence,
+			TopLeft,
+			Note6,
+			Note4,
+			Note3,
+			Note2,
+			Note1,
+			Seq,
+			Note0,
+			SecondFromTopLeft,
+			IdkLeft,
+			Release,
+			Attack,
+			Button13,
+			Note7,
+			Shift,
+			Note8,
+			Gate,
+			Button18,
+			Button19,
+			Button20,
+			A,
+			Play,
+			Stop,
+			IdkRight,
+			Chase,
+			Button26,
+		} KeyId;
+			
+		typedef enum {
+			PriorityMax = 0,
+			High = 10,
+			Medium = 100,
+			Low = 1000,
+		} Priority;
+
+		Event() {}
+		virtual ~Event() {}
+
+		virtual EventType GetEventType() const = 0;
+	};
+
+	class MidiClockEvent : public Event
+	{
+		EventType GetEventType() const { return Event::MidiClock; }
+	};
+
+	class MillisecondClockEvent : public Event
+	{
+		EventType GetEventType() const { return Event::MillisecondClock; }
+	};
+
+	class KeyPressEvent : public Event
+	{
+	public:
+		KeyPressEvent(KeyId keyId, uint8_t modifiers) : mKeyId(keyId), mModifiers(modifiers) {}
+		EventType GetEventType() const { return Event::MillisecondClock; }
+		KeyId GetKeyId() const { return mKeyId; }
+		uint8_t GetModifiers() const { return mModifiers; }
+	private:
+		KeyId mKeyId;
+		uint8_t mModifiers;
+	};
 	
 	class EventController
 	{
-    public:
-      typedef std::function<int()> EventHandler;
+	public:
+		typedef std::function<int()> EventHandler;
 
-		public:
-			static void Init();
-			static void Shutdown();
-			static EventController* GetInstance() { return mInstance; }
+		static void Init();
+		static void Shutdown();
+		static EventController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
 
-			void AddEventHandler(Event::EventType type, Event::Priority priority, EventHandler eventHandler);
-      void BroadcastEvent(const Event& event);
+		void AddEventHandler(Event::EventType type, EventHandler eventHandler);
+		void BroadcastEvent(const Event& event);
 
-		private:
-			EventController();
-			virtual ~EventController();
+	private:
+		EventController();
+		virtual ~EventController();
 
-			static EventController* mInstance;
+		static EventController* mInstance;
 
-			bool mBusy;
+		bool mBusy;
 
-      typedef Atomic::Vector<EventHandler> EventHandlerList;
-      EventHandlerList* mHandlerMap;
-      EventHandlerList* mHandlerAddQueue;
-      EventHandlerList* mHandlerRemoveQueue;
+		typedef Atomic::Vector<EventHandler> EventHandlerList;
+		EventHandlerList* mHandlerMap;
+		EventHandlerList* mHandlerAddQueue;
+		EventHandlerList* mHandlerRemoveQueue;
 	};
 
 	class MidiNoteEvent : public Event
 	{
-		public:
-			EventType GetEventType() const { return MidiNote; }
+	public:
+		EventType GetEventType() const { return MidiNote; }
 
-		private:
-			uint16_t mDuration;
-			uint8_t mNote;
-			uint8_t mVelocity;
+	private:
+		uint16_t mDuration;
+		uint8_t mNote;
+		uint8_t mVelocity;
 	};
 
 	class MidiEvent : public Event
 	{
-		public:
-			MidiEvent(EventType eventType) { mEventType=eventType; }
-			virtual ~MidiEvent() {}
+	public:
+		MidiEvent(EventType eventType) { mEventType=eventType; }
+		virtual ~MidiEvent() {}
 
-		private:
-			EventType mEventType;
+	private:
+		EventType mEventType;
 	};
 
 	class MidiChannelMessageEvent : public MidiEvent

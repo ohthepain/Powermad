@@ -7,32 +7,12 @@ class IntervalTimer;
 
 namespace Atomic
 {
-	class TimerController
-	{
-		public:
-			static void Init();
-			static void Shutdown();
-			static TimerController* GetInstance() { return mInstance; }
-
-		private:
-			TimerController();
-			virtual ~TimerController();
-
-			static void HandleTimer();
-
-			static TimerController* mInstance;
-		
-			EventController* mEventController;
-
-			IntervalTimer* mTimer;
-	};
-
 	class PanelButtonsController
 	{
 		public:
 			static void Init();
 			static void Shutdown();
-			static PanelButtonsController* GetInstance() { return mInstance; }
+			static PanelButtonsController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
 
       int HandleTimer();
       void HandleRawKeyPress(int i);

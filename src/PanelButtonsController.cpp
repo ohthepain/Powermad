@@ -6,50 +6,7 @@
 
 namespace Atomic
 {
-	TimerController* TimerController::mInstance = nullptr;
 	PanelButtonsController* PanelButtonsController::mInstance = nullptr;
-
-	TimerController::TimerController()
-	{
-		mEventController = EventController::GetInstance();
-		assert(mEventController != nullptr);
-
-    Serial.println("Start timer");
-		mTimer = new IntervalTimer();
-		mTimer->begin(TimerController::HandleTimer, 1000);
-	}
-
-	TimerController::~TimerController()
-	{
-		mTimer->end();
-		delete mTimer;
-		mTimer = nullptr;
-	}
-
-	void TimerController::Init()
-	{
-		mInstance = new TimerController();
-	}
-
-	void TimerController::Shutdown()
-	{
-		assert(mInstance != nullptr);
-		delete mInstance;
-		mInstance = nullptr;
-	}
-
-	//	Timer
-	void TimerController::HandleTimer()
-	{
-		static int n = 0;
-		if (++n > 1000)
-		{
-			Serial.println("handleTimer: second");
-			n = 0;
-		}
-    static MillisecondClockEvent millisecondClockEvent;
-    EventController::GetInstance()->BroadcastEvent(millisecondClockEvent);
-	}
 
 	void PanelButtonsController::Init()
 	{
@@ -74,7 +31,7 @@ namespace Atomic
 		pinMode(kInputPin, INPUT);
 
     EventController::EventHandler myFunction = [&]() { this->Update(); return 0; };
-    EventController::GetInstance()->AddEventHandler(Event::MillisecondClock, Event::PriorityMax, myFunction);
+    EventController::GetInstance()->AddEventHandler(Event::MillisecondClock, myFunction);
 	}
 
   int PanelButtonsController::HandleTimer()

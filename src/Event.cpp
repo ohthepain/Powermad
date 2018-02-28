@@ -96,12 +96,13 @@ namespace Atomic
     mHandlerMap = nullptr;
   }
 	
-	void EventController::AddEventHandler(Event::EventType eventType, Event::Priority priority, EventHandler eventHandler)
+	void EventController::AddEventHandler(Event::EventType eventType, EventHandler eventHandler)
 	{
     assert(eventType < Event::ArraySize);
     assert(!mBusy);
 		if (mBusy)
 		{
+      Serial.println("AddEventHandler: busy");
       EventHandlerList& eventHandlerList = mHandlerAddQueue[eventType];
       eventHandlerList.Add(eventHandler);
 		}
