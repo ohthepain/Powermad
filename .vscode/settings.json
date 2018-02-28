@@ -1,0 +1,6 @@
+{
+	"terminal.integrated.env.osx": {
+		"PATH": "/Users/paul/.platformio/penv/bin:/Users/paul/.platformio/penv:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/paul/projects/tools/arm/gcc-arm-none-eabi-7-2017-q4-major/bin/:/usr/local/MacGPG2/bin",
+		"PLATFORMIO_CALLER": "vscode"
+	}
+}
