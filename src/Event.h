@@ -110,7 +110,7 @@ namespace Atomic
 	{
 	public:
 		KeyPressEvent(KeyId keyId, uint8_t modifiers) : mKeyId(keyId), mModifiers(modifiers) {}
-		EventType GetEventType() const { return Event::MillisecondClock; }
+		EventType GetEventType() const { return Event::KeyPress; }
 		KeyId GetKeyId() const { return mKeyId; }
 		uint8_t GetModifiers() const { return mModifiers; }
 	private:
