@@ -38,12 +38,6 @@ namespace Atomic
 	//	Timer
 	void TimerController::HandleTimer()
 	{
-		static int n = 0;
-		if (++n > 1000)
-		{
-			Serial.println("handleTimer: second");
-			n = 0;
-		}
     static MillisecondClockEvent millisecondClockEvent;
     EventController::GetInstance()->BroadcastEvent(millisecondClockEvent);
 	}

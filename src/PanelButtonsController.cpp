@@ -30,8 +30,10 @@ namespace Atomic
 		pinMode(kDataPin, OUTPUT);
 		pinMode(kInputPin, INPUT);
 
-    EventController::EventHandler myFunction = [&]() { this->Update(); return 0; };
+    EventController::EventHandler myFunction = [&](const Event& event) { this->Update(); return 0; };
     EventController::GetInstance()->AddEventHandler(Event::MillisecondClock, myFunction);
+		EventController::EventHandler myFunction2 = [&](const Event& event) { this->HandleRawKeyEvent(event); return 0; };
+    EventController::GetInstance()->AddEventHandler(Event::RawKey, myFunction2);
 	}
 
   int PanelButtonsController::HandleTimer()
@@ -66,9 +68,26 @@ namespace Atomic
     
   };
 
-  void PanelButtonsController::HandleRawKeyPress(int keynum)
+  void PanelButtonsController::HandleRawKeyEvent(const Event& event)
   {
-    Serial.print("HandleRawKeyPress: "); Serial.println(keynum);
+		static bool shift = false;
+		const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
+
+		if (rawKeyEvent.GetKeyId() == Event::Shift)
+		{
+			shift = !rawKeyEvent.GetUp();
+		}
+		else if (!rawKeyEvent.GetUp())
+		{
+			uint8_t modifiers = 0;
+			if (shift)
+			{
+				modifiers |= 0x01;
+			}
+			//Serial.print("key press: "); Serial.print(rawKeyEvent.GetKeyId()); Serial.print(" modifiers: "); Serial.println(modifiers);
+	    KeyPressEvent keyPressEvent((Event::KeyId)1, modifiers);
+  	  EventController::GetInstance()->BroadcastEvent(keyPressEvent);
+		}
   }
 
 	void PanelButtonsController::Update() 
@@ -76,28 +95,30 @@ namespace Atomic
 		unsigned long keyState = ScanKeys();
 		if (keyState != mTempKeyState)
 		{
-      Serial.print("RAW key state change: "); Serial.println(keyState);
-			mTempKeyState = keyState;
+      mTempKeyState = keyState;
 			mTimeLastKeyStateChange = millis();
 		}
 		if (mTimeLastKeyStateChange != 0)
 		{
-			if (millis() - mTimeLastKeyStateChange > 2)
+			if (millis() - mTimeLastKeyStateChange > 3)
 			{
-				Serial.print("key state change: "); Serial.println(keyState);
-				mSavedKeyState = keyState;
 				mTimeLastKeyStateChange = 0;
 
         uint32_t keymask = 1;
         for (int i=1; i<=32; i++)
         {
-          if (keyState & keymask)
+          if ((mSavedKeyState ^ keyState) & keymask)
           {
-            KeyPressEvent keyPressEvent((Event::KeyId)i, 0);
-            EventController::GetInstance()->BroadcastEvent(keyPressEvent);
+						//Serial.print("mSavedKeyState: "); Serial.print(mSavedKeyState); Serial.print(", keyState: "); Serial.print(keyState); Serial.print(", keymask: "); Serial.println(keymask);
+						//Serial.print("mSavedKeyState and keymask: "); Serial.print(mSavedKeyState & keymask); Serial.print(", keyState and keymask: "); Serial.println(keyState & keymask); 
+
+						bool up = (keyState & keymask) == 0;
+						RawKeyEvent rawKeyEvent((Event::KeyId)i, up);
+            EventController::GetInstance()->BroadcastEvent(rawKeyEvent);
           }
           keymask <<= 1;
         }
+				mSavedKeyState = keyState;
 			}
 		}
 	}

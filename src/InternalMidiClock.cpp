@@ -20,7 +20,7 @@ namespace Atomic
 		mLastMidiPulseTime = (double)millis();
 
 		EventController* eventController = EventController::GetInstance();
-		EventController::EventHandler myFunction = [&]() -> int { this->HandleMillisecondEvent(); return 0; };
+		EventController::EventHandler myFunction = [&](const Event& event) -> int { this->HandleMillisecondEvent(); return 0; };
 		eventController->AddEventHandler(Event::MillisecondClock, myFunction);
 	}
 

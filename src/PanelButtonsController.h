@@ -14,8 +14,8 @@ namespace Atomic
 			static void Shutdown();
 			static PanelButtonsController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
 
-      int HandleTimer();
-      void HandleRawKeyPress(int i);
+      		int HandleTimer();
+      		void HandleRawKeyEvent(const Event& event);
       
 		private:
 			PanelButtonsController();

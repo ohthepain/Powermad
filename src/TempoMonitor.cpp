@@ -17,7 +17,7 @@ namespace Atomic
 		pinMode(LED_PIN, OUTPUT);
 
 		EventController* eventController = EventController::GetInstance();
-		EventController::EventHandler myFunction = [&]() { this->HandleMidiClock(); return 0; };
+		EventController::EventHandler myFunction = [&](const Event& event) { this->HandleMidiClock(); return 0; };
 		eventController->AddEventHandler(Event::MidiClock, myFunction);
 	}
 

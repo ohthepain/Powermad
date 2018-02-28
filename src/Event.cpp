@@ -121,7 +121,7 @@ namespace Atomic
     for (size_t i=0; i<eventHandlerList.GetSize(); i++)
     {
       EventHandler eventHandler = eventHandlerList[i];
-      eventHandler();
+      eventHandler(event);
     }
 
     mBusy = false;

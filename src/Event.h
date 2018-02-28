@@ -42,28 +42,27 @@ namespace Atomic
 		} EventType;
 
 		typedef enum {
-			Illegal,
+			Illegal = 0,
 			Sequence,
 			TopLeft,
 			Note6,
+			Note5,
 			Note4,
 			Note3,
 			Note2,
 			Note1,
-			Seq,
-			Note0,
+			Arp,
 			SecondFromTopLeft,
 			IdkLeft,
 			Release,
 			Attack,
-			Button13,
 			Note7,
 			Shift,
 			Note8,
 			Gate,
 			Button18,
 			Button19,
-			Button20,
+			B,
 			A,
 			Play,
 			Stop,
@@ -95,6 +94,18 @@ namespace Atomic
 		EventType GetEventType() const { return Event::MillisecondClock; }
 	};
 
+	class RawKeyEvent : public Event
+	{
+	public:
+		RawKeyEvent(KeyId keyId, bool up) : mKeyId(keyId), mUp(up) {}
+		EventType GetEventType() const { return Event::RawKey; }
+		KeyId GetKeyId() const { return mKeyId; }
+		bool GetUp() const { return mUp; }
+	private:
+		KeyId mKeyId;
+		bool mUp;		
+	};
+
 	class KeyPressEvent : public Event
 	{
 	public:
@@ -110,7 +121,7 @@ namespace Atomic
 	class EventController
 	{
 	public:
-		typedef std::function<int()> EventHandler;
+		typedef std::function<int(const Event&)> EventHandler;
 
 		static void Init();
 		static void Shutdown();
