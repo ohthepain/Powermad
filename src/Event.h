@@ -42,6 +42,15 @@ namespace Atomic
 		} EventType;
 
 		typedef enum {
+			IllegalAnalogInput,
+			LeftJoystickX,
+			LeftJoystickY,
+			RightJoystickX,
+			RightJoystickY,
+			NumAnalogInputs,
+		} AnalogInputId;
+
+		typedef enum {
 			Illegal = 0,
 			Sequence,
 			TopLeft,
@@ -69,6 +78,8 @@ namespace Atomic
 			IdkRight,
 			Chase,
 			Button26,
+			LeftJoystickButton,
+			RightJoystickButton,
 		} KeyId;
 			
 		typedef enum {
