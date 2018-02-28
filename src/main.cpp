@@ -7,6 +7,7 @@
 #include "NavigationController.h"
 #include "Song.h"
 #include "InternalMidiClock.h"
+#include "EventMonitor.h"
 
 #define LED 13
 
