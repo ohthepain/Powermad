@@ -31,9 +31,9 @@ namespace Atomic
 		pinMode(kInputPin, INPUT);
 
     EventController::EventHandler myFunction = [&](const Event& event) { this->Update(); return 0; };
-    EventController::GetInstance()->AddEventHandler(Event::MillisecondClock, myFunction);
+    EventController::GetInstance()->AddEventHandler(EventType::MillisecondClock, myFunction);
 		EventController::EventHandler myFunction2 = [&](const Event& event) { this->HandleRawKeyEvent(event); return 0; };
-    EventController::GetInstance()->AddEventHandler(Event::RawKey, myFunction2);
+    EventController::GetInstance()->AddEventHandler(EventType::RawKey, myFunction2);
 	}
 
   int PanelButtonsController::HandleTimer()
@@ -85,7 +85,8 @@ namespace Atomic
 				modifiers |= 0x01;
 			}
 			//Serial.print("key press: "); Serial.print(rawKeyEvent.GetKeyId()); Serial.print(" modifiers: "); Serial.println(modifiers);
-	    KeyPressEvent keyPressEvent((Event::KeyId)1, modifiers);
+			const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
+	    KeyPressEvent keyPressEvent(rawKeyEvent.GetKeyId(), modifiers);
   	  EventController::GetInstance()->BroadcastEvent(keyPressEvent);
 		}
   }

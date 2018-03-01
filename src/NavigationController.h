@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include "Song.h"
+#include "Event.h"
 #include <assert.h>
 
 namespace Atomic
@@ -20,9 +21,11 @@ namespace Atomic
 	private:
 		static NavigationController* mInstance;
 
-		Song* mSong;
-
 		NavigationController();
 		virtual ~NavigationController();
+
+		void HandleKeyPressEvent(const Event& event);
+
+		Song* mSong;
 	};
 }

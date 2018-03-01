@@ -23,14 +23,11 @@ namespace Atomic
 	EventMonitor::EventMonitor()
 	{
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleEvent(event); return 0; };
-		EventController::GetInstance()->AddEventHandler(Event::MidiNote, handler);
-		EventController::GetInstance()->AddEventHandler(Event::MidiPlay, handler);
-		EventController::GetInstance()->AddEventHandler(Event::MidiStop, handler);
-		EventController::GetInstance()->AddEventHandler(Event::MidiContinue, handler);
-		//EventController::GetInstance()->AddEventHandler(Event::MillisecondClock, handler);
-		//EventController::GetInstance()->AddEventHandler(Event::MidiClock, handler);
-		EventController::GetInstance()->AddEventHandler(Event::KeyPress, handler);
-		//EventController::GetInstance()->AddEventHandler(Event::RawKey, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::SystemRealTimeMessage, handler);
+		//EventController::GetInstance()->AddEventHandler(EventType::MillisecondClock, handler);
+		//EventController::GetInstance()->AddEventHandler(EventType::MidiClock, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
+		//EventController::GetInstance()->AddEventHandler(EventType::RawKey, handler);
 	}
 
 	EventMonitor::~EventMonitor()
@@ -41,30 +38,21 @@ namespace Atomic
 	{
 		switch (event.GetEventType())
 		{
-		case Event::MidiNote:
-			Serial.println("Event: MidiNote");
+		case EventType::SystemRealTimeMessage:
+			//Serial.println("Event: SystemRealTimeMessage");
 			break;
-		case Event::MidiPlay:
-			Serial.println("Event: MidiPlay");
-			break;
-		case Event::MidiStop:
-			Serial.println("Event: MidiStop");
-			break;
-		case Event::MidiContinue:
-			Serial.println("Event: MidiContinue");
-			break;
-		case Event::MillisecondClock:
+		case EventType::MillisecondClock:
 			Serial.println("Event: MillisecondClock");
 			break;
-		case Event::MidiClock:
-			Serial.println("Event: MidiClock");
-			break;
-		case Event::KeyPress:
+		case EventType::KeyPress:
 			Serial.println("Event: KeyPress");
 			break;
-		case Event::RawKey:
-			Serial.println("Event: RawKey");
+		case EventType::RawKey:
+		{
+			const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
+			Serial.print("Event: RawKey: "); Serial.println(rawKeyEvent.GetKeyId());
 			break;
+		}
 		default:
 			assert(0 && "Illegal event type");
 		}

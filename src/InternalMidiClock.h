@@ -20,6 +20,7 @@ namespace Atomic
 			virtual ~InternalMidiClock() {}
 
 			void HandleMillisecondEvent();
+			void HandleKeyPress(const Event& event);
 
 			double mLastMidiPulseTime;
 	};

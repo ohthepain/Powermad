@@ -1,6 +1,7 @@
 // NavigationController.cpp
 
 #include "NavigationController.h"
+#include <Arduino.h>
 
 namespace Atomic
 {
@@ -9,6 +10,9 @@ namespace Atomic
 	NavigationController::NavigationController()
 	{
 		mSong = new Song();
+
+		EventController::EventHandler handler = [&](const Event& event) { this->HandleKeyPressEvent(event); return 0; };
+		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
 	}
 
 	NavigationController::~NavigationController()
@@ -26,5 +30,35 @@ namespace Atomic
 	{
 		delete mInstance;
 		mInstance = nullptr;
+	}
+
+	void NavigationController::HandleKeyPressEvent(const Event& event)
+	{
+		const KeyPressEvent& keyPressEvent = static_cast<const KeyPressEvent&>(event);
+		switch (keyPressEvent.GetKeyId())
+		{
+			case Event::Song:
+				Serial.println("NavigationController::HandleKeyPressEvent: Song");
+				static const SetViewEvent setViewSong(ViewId::Song);
+				EventController::GetInstance()->BroadcastEvent(setViewSong);
+				break;
+			case Event::Sequence:
+				Serial.println("NavigationController::HandleKeyPressEvent: Sequence");
+				static const SetViewEvent setViewSequence(ViewId::Sequence);
+				EventController::GetInstance()->BroadcastEvent(setViewSequence);
+				break;
+			case Event::Arp:
+				Serial.println("NavigationController::HandleKeyPressEvent: Arp");
+				static const SetViewEvent setViewArp(ViewId::Arp);
+				EventController::GetInstance()->BroadcastEvent(setViewArp);
+				break;
+			case Event::Gate:
+				Serial.println("NavigationController::HandleKeyPressEvent: Gate");
+				static const SetViewEvent setViewGate(ViewId::Gate);
+				EventController::GetInstance()->BroadcastEvent(setViewGate);
+				break;
+			default:
+				break;
+		}
 	}
 }

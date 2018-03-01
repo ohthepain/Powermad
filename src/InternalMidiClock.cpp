@@ -21,7 +21,9 @@ namespace Atomic
 
 		EventController* eventController = EventController::GetInstance();
 		EventController::EventHandler myFunction = [&](const Event& event) -> int { this->HandleMillisecondEvent(); return 0; };
-		eventController->AddEventHandler(Event::MillisecondClock, myFunction);
+		eventController->AddEventHandler(EventType::MillisecondClock, myFunction);
+		EventController::EventHandler myFunction2 = [&](const Event& event) -> int { this->HandleKeyPress(event); return 0; };
+		eventController->AddEventHandler(EventType::KeyPress, myFunction2);
 	}
 
 	void InternalMidiClock::Init()
@@ -35,7 +37,28 @@ namespace Atomic
 		mInstance = nullptr;
 	}
 
-	//	Timer
+	void InternalMidiClock::HandleKeyPress(const Event& event)
+	{
+		const KeyPressEvent& keyPressEvent = static_cast<const KeyPressEvent&>(event);
+		switch (keyPressEvent.GetKeyId())
+		{
+			case Event::Play:
+			{
+				static SystemRealTimeMessage systemRealTimeMessage(SystemRealTimeMessageId::Continue);
+				EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);
+				break;
+			}
+			case Event::Stop:
+			{
+				static SystemRealTimeMessage systemRealTimeMessage(SystemRealTimeMessageId::Stop);
+				EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);
+				break;
+			}
+			default:
+				break;
+		}
+	}
+
 	void InternalMidiClock::HandleMillisecondEvent()
 	{
 		static NavigationController* navigationController = NavigationController::GetInstance();
@@ -46,8 +69,8 @@ namespace Atomic
 		if (currentTime - mLastMidiPulseTime >= msecPerPulse)
 		{
 			mLastMidiPulseTime += msecPerPulse;
-			static MidiClockEvent midiClockEvent;
-			EventController::GetInstance()->BroadcastEvent(midiClockEvent);
+			static SystemRealTimeMessage systemRealTimeMessage(SystemRealTimeMessageId::TimingClock);
+			EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);	
 		}
 	}
 }

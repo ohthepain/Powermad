@@ -26,22 +26,38 @@ namespace Atomic
 		size_t mCapacity;
 	};
 
+	enum class ViewId {
+		Song,
+		Sequence,
+		Arp,
+		Gate,
+	};
+
+	enum class MidiSystemMessage {
+		// Song Select F3H
+		SongSelect,
+		// Tune Request F6H 
+		TuneRequest,
+		// EOX (End of Exclusive) F7H
+		//EOX,
+		// MidiSystemMessageEvent - System Exclusive Message, System Real Time Message
+		// All other messages (status, data byte, data byte)
+	};
+
+	enum class EventType {
+		MidiNote,
+		MillisecondClock,
+		SecondClock,
+		SystemRealTimeMessage,
+		KeyPress,
+		SetView,
+		RawKey,
+		ArraySize,
+	};
+
 	class Event
 	{
 	public:
-		typedef enum {
-			MidiNote,
-			MidiPlay,
-			MidiStop,
-			MidiContinue,
-			MillisecondClock,
-			SecondClock,
-			MidiClock,
-			KeyPress,
-			RawKey,
-			ArraySize,
-		} EventType;
-
 		typedef enum {
 			IllegalAnalogInput,
 			LeftJoystickX,
@@ -78,7 +94,7 @@ namespace Atomic
 			Stop,
 			IdkRight,
 			Chase,
-			Button26,
+			Song,
 			LeftJoystickButton,
 			RightJoystickButton,
 		} KeyId;
@@ -96,26 +112,56 @@ namespace Atomic
 		virtual EventType GetEventType() const = 0;
 	};
 
-	class MidiClockEvent : public Event
+	class SetViewEvent : public Event
 	{
-		EventType GetEventType() const { return Event::MidiClock; }
+	public:
+		SetViewEvent(ViewId viewId) : mViewId(viewId) {}
+		EventType GetEventType() const { return EventType::SetView; }
+		ViewId GetViewId() const { return mViewId; }
+	private:
+		ViewId mViewId;
+	};
+
+	enum class SystemRealTimeMessageId {
+		// Timing Clock F8H 
+		TimingClock,
+		// Start FAH
+		Start, 
+		// Continue FBH 
+		Continue,
+		// Stop FCH 
+		Stop,
+		// Active Sensing FEH 
+		ActiveSensing,
+		// System Reset FFH
+		SystemReset,
+	};
+
+	class SystemRealTimeMessage : public Event
+	{
+	public:
+		SystemRealTimeMessage(SystemRealTimeMessageId systemRealTimeMessageId) : mSystemRealTimeMessageId(systemRealTimeMessageId) {}
+		EventType GetEventType() const { return EventType::SystemRealTimeMessage; }
+		SystemRealTimeMessageId GetSystemRealTimeMessageId() const { return mSystemRealTimeMessageId; }
+	private:
+		SystemRealTimeMessageId mSystemRealTimeMessageId;
 	};
 
 	class SecondClockEvent : public Event
 	{
-		EventType GetEventType() const { return Event::SecondClock; }
+		EventType GetEventType() const { return EventType::SecondClock; }
 	};
 
 	class MillisecondClockEvent : public Event
 	{
-		EventType GetEventType() const { return Event::MillisecondClock; }
+		EventType GetEventType() const { return EventType::MillisecondClock; }
 	};
 
 	class RawKeyEvent : public Event
 	{
 	public:
 		RawKeyEvent(KeyId keyId, bool up) : mKeyId(keyId), mUp(up) {}
-		EventType GetEventType() const { return Event::RawKey; }
+		EventType GetEventType() const { return EventType::RawKey; }
 		KeyId GetKeyId() const { return mKeyId; }
 		bool GetUp() const { return mUp; }
 	private:
@@ -127,7 +173,7 @@ namespace Atomic
 	{
 	public:
 		KeyPressEvent(KeyId keyId, uint8_t modifiers) : mKeyId(keyId), mModifiers(modifiers) {}
-		EventType GetEventType() const { return Event::KeyPress; }
+		EventType GetEventType() const { return EventType::KeyPress; }
 		KeyId GetKeyId() const { return mKeyId; }
 		uint8_t GetModifiers() const { return mModifiers; }
 	private:
@@ -144,7 +190,7 @@ namespace Atomic
 		static void Shutdown();
 		static EventController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
 
-		void AddEventHandler(Event::EventType type, EventHandler eventHandler);
+		void AddEventHandler(EventType type, EventHandler eventHandler);
 		void BroadcastEvent(const Event& event);
 
 	private:
@@ -164,7 +210,7 @@ namespace Atomic
 	class MidiNoteEvent : public Event
 	{
 	public:
-		EventType GetEventType() const { return MidiNote; }
+		EventType GetEventType() const { return EventType::MidiNote; }
 
 	private:
 		uint16_t mDuration;

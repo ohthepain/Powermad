@@ -18,7 +18,7 @@ namespace Atomic
 		mPinToAnalogInputAssigments = new tPinToAnalogInputAssigment[kMaxPinToAnalogInputAssignments];
 
 		EventController::EventHandler myFunction = [&](const Event& event) { this->HandleMillisecondClock(); return 0; };
-    	EventController::GetInstance()->AddEventHandler(Event::MillisecondClock, myFunction);
+    	EventController::GetInstance()->AddEventHandler(EventType::MillisecondClock, myFunction);
 	}
 
 	InputPinManager::~InputPinManager()

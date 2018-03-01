@@ -22,6 +22,6 @@ namespace Atomic
 			TempoMonitor();
 			virtual ~TempoMonitor() {}
 
-			static void HandleMidiClock();
+			void HandleSystemRealTimeMessage(const Event&);
 	};
 }

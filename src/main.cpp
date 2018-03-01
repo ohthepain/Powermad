@@ -10,6 +10,7 @@
 #include "EventMonitor.h"
 #include "InputPinManager.h"
 #include "LcdDisplayController.h"
+#include "SongViewLcd.h"
 
 #define LED 13
 
@@ -30,6 +31,8 @@ void setup()
   Atomic::InputPinManager::GetInstance()->AddAnalogInputPin(22, Atomic::Event::RightJoystickY);
   Atomic::InputPinManager::GetInstance()->AddDigitalInputPin(23, Atomic::Event::RightJoystickButton);
   Atomic::LcdDisplayController::Init();
+
+  Atomic::SongViewLcd::Init();
 }
 
 void loop()

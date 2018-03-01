@@ -85,9 +85,9 @@ namespace Atomic
   EventController::EventController()
   : mBusy(false)
   {
-    mHandlerMap = new EventHandlerList[Event::ArraySize];
-    mHandlerAddQueue = new EventHandlerList[Event::ArraySize];
-    mHandlerRemoveQueue = new EventHandlerList[Event::ArraySize];
+    mHandlerMap = new EventHandlerList[EventType::ArraySize];
+    mHandlerAddQueue = new EventHandlerList[EventType::ArraySize];
+    mHandlerRemoveQueue = new EventHandlerList[EventType::ArraySize];
   }
 
   EventController::~EventController()
@@ -96,19 +96,19 @@ namespace Atomic
     mHandlerMap = nullptr;
   }
 	
-	void EventController::AddEventHandler(Event::EventType eventType, EventHandler eventHandler)
+	void EventController::AddEventHandler(EventType eventType, EventHandler eventHandler)
 	{
-    assert(eventType < Event::ArraySize);
+    int eventTypeInt = static_cast<int>(eventType);
     assert(!mBusy);
 		if (mBusy)
 		{
       Serial.println("AddEventHandler: busy");
-      EventHandlerList& eventHandlerList = mHandlerAddQueue[eventType];
+      EventHandlerList& eventHandlerList = mHandlerAddQueue[eventTypeInt];
       eventHandlerList.Add(eventHandler);
 		}
 		else
 		{
-      EventHandlerList& eventHandlerList = mHandlerMap[eventType];
+      EventHandlerList& eventHandlerList = mHandlerMap[eventTypeInt];
       eventHandlerList.Add(eventHandler);
 		}
 	}
@@ -116,8 +116,8 @@ namespace Atomic
   void EventController::BroadcastEvent(const Event& event)
   {
     mBusy = true;
-    int eventType = (int)event.GetEventType();
-    EventHandlerList& eventHandlerList = mHandlerMap[eventType];
+    int eventTypeInt = static_cast<int>(event.GetEventType());
+    EventHandlerList& eventHandlerList = mHandlerMap[eventTypeInt];
     for (size_t i=0; i<eventHandlerList.GetSize(); i++)
     {
       EventHandler eventHandler = eventHandlerList[i];

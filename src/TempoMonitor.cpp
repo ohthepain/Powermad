@@ -17,8 +17,8 @@ namespace Atomic
 		pinMode(LED_PIN, OUTPUT);
 
 		EventController* eventController = EventController::GetInstance();
-		EventController::EventHandler myFunction = [&](const Event& event) { this->HandleMidiClock(); return 0; };
-		eventController->AddEventHandler(Event::MidiClock, myFunction);
+		EventController::EventHandler myFunction = [&](const Event& event) { this->HandleSystemRealTimeMessage(event); return 0; };
+		eventController->AddEventHandler(EventType::SystemRealTimeMessage, myFunction);
 	}
 
 	void TempoMonitor::Init()
@@ -32,18 +32,21 @@ namespace Atomic
 		mInstance = nullptr;
 	}
 
-	//	Timer
-	void TempoMonitor::HandleMidiClock()
+	void TempoMonitor::HandleSystemRealTimeMessage(const Event& event)
 	{
-		static int count = 0;
-		switch (count++)
+		const SystemRealTimeMessage& systemRealTimeMessage = static_cast<const SystemRealTimeMessage&>(event);
+		if (systemRealTimeMessage.GetSystemRealTimeMessageId() == SystemRealTimeMessageId::TimingClock)
 		{
-			case 15                          :
-				digitalWrite(LED_PIN, HIGH);
-				break;
-			case 16:
-				digitalWrite(LED_PIN, LOW);
-				count = 0;
+			static int count = 0;
+			switch (count++)
+			{
+				case 15                          :
+					digitalWrite(LED_PIN, HIGH);
+					break;
+				case 16:
+					digitalWrite(LED_PIN, LOW);
+					count = 0;
+			}
 		}
 	}
 }
