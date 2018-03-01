@@ -26,13 +26,6 @@ namespace Atomic
 		size_t mCapacity;
 	};
 
-	enum class ViewId {
-		Song,
-		Sequence,
-		Arp,
-		Gate,
-	};
-
 	enum class MidiSystemMessage {
 		// Song Select F3H
 		SongSelect,
@@ -110,16 +103,6 @@ namespace Atomic
 		virtual ~Event() {}
 
 		virtual EventType GetEventType() const = 0;
-	};
-
-	class SetViewEvent : public Event
-	{
-	public:
-		SetViewEvent(ViewId viewId) : mViewId(viewId) {}
-		EventType GetEventType() const { return EventType::SetView; }
-		ViewId GetViewId() const { return mViewId; }
-	private:
-		ViewId mViewId;
 	};
 
 	enum class SystemRealTimeMessageId {

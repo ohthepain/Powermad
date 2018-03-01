@@ -47,6 +47,9 @@ namespace Atomic
 			SystemRealTimeMessageId systemRealTimeMessageId = systemRealTimeMessage.GetSystemRealTimeMessageId();
 			switch (systemRealTimeMessageId)
 			{
+			case SystemRealTimeMessageId::TimingClock:
+				HandleMidiClock();
+				break;
 			case SystemRealTimeMessageId::Start:
 				lcdDisplayController->WriteToScreen(19, 0, "P");
 				break;
@@ -57,6 +60,9 @@ namespace Atomic
 			case SystemRealTimeMessageId::Continue:
 				lcdDisplayController->WriteToScreen(19, 1, "C");
 				Serial.println("Event: MidiContinue");
+				break;
+			default:
+				// Active Sensing or System Reset
 				break;
 			}
 		}
@@ -71,24 +77,7 @@ namespace Atomic
 		}
 	}
 
-	void View::HandleEvent(const Event& event)
+	void SongViewLcd::HandleMidiClock()
 	{
-		switch (event.GetEventType())
-		{
-			case EventType::SetView:
-			{
-				const SetViewEvent& setViewEvent = static_cast<const SetViewEvent&>(event);
-				ViewId viewId = setViewEvent.GetViewId();
-				SetActive(viewId == GetViewId());
-				break;
-			}
-			default:
-				break;
-		}
-
-		if (IsActive())
-		{
-			HandleActiveEvent(event);
-		}
 	}
 }

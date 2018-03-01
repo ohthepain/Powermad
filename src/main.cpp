@@ -11,6 +11,9 @@
 #include "InputPinManager.h"
 #include "LcdDisplayController.h"
 #include "SongViewLcd.h"
+#include "SeqViewLcd.h"
+#include "ArpViewLcd.h"
+#include "GateViewLcd.h"
 
 #define LED 13
 
@@ -33,6 +36,9 @@ void setup()
   Atomic::LcdDisplayController::Init();
 
   Atomic::SongViewLcd::Init();
+  Atomic::SeqViewLcd::Init();
+  Atomic::ArpViewLcd::Init();
+  Atomic::GateViewLcd::Init();
 }
 
 void loop()

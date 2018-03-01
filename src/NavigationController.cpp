@@ -1,5 +1,6 @@
 // NavigationController.cpp
 
+#include "View.h"
 #include "NavigationController.h"
 #include <Arduino.h>
 
@@ -43,9 +44,9 @@ namespace Atomic
 				EventController::GetInstance()->BroadcastEvent(setViewSong);
 				break;
 			case Event::Sequence:
-				Serial.println("NavigationController::HandleKeyPressEvent: Sequence");
-				static const SetViewEvent setViewSequence(ViewId::Sequence);
-				EventController::GetInstance()->BroadcastEvent(setViewSequence);
+				Serial.println("NavigationController::HandleKeyPressEvent: Seq");
+				static const SetViewEvent setViewSeq(ViewId::Seq);
+				EventController::GetInstance()->BroadcastEvent(setViewSeq);
 				break;
 			case Event::Arp:
 				Serial.println("NavigationController::HandleKeyPressEvent: Arp");
