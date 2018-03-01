@@ -1,4 +1,4 @@
-// PanelButtonsController
+// TimerController.h
 
 #include <assert.h>
 

@@ -8,11 +8,11 @@ namespace Atomic
 	InputPinManager* InputPinManager::mInstance = nullptr;
 
 	InputPinManager::InputPinManager()
-	: mNumPinToKeyAssigments(0)
-	, mNumPinToAnalogInputAssigments(0)
-	, mSavedKeyState(0)
+	: mSavedKeyState(0)
 	, mTimeLastKeyStateChange(0)
 	, mTempKeyState(0)
+	, mNumPinToKeyAssigments(0)
+	, mNumPinToAnalogInputAssigments(0)
 	{
 		mPinToKeyAssignments = new tPinToKeyAssigment[kMaxPinToKeyAssignments];
 		mPinToAnalogInputAssigments = new tPinToAnalogInputAssigment[kMaxPinToAnalogInputAssignments];
@@ -49,7 +49,7 @@ namespace Atomic
 		mPinToKeyAssignments[mNumPinToKeyAssigments].keyId = rawButtonNumber;
 		++mNumPinToKeyAssigments;
 
-		pinMode(pinNumber, INPUT);
+		pinMode(pinNumber, INPUT_PULLUP);
 	}
 
 	void InputPinManager::AddAnalogInputPin(int pinNumber, tAnalogInputId analogInputId)
@@ -64,7 +64,7 @@ namespace Atomic
 
 	float InputPinManager::GetAnalogInputValue(tAnalogInputId analogInputId)
 	{
-		for (int n=0; n<mNumPinToAnalogInputAssigments; n++)
+		for (size_t n=0; n<mNumPinToAnalogInputAssigments; n++)
 		{
 			if (mPinToAnalogInputAssigments[n].analogInputId == analogInputId)
 			{
@@ -78,10 +78,10 @@ namespace Atomic
 	void InputPinManager::HandleMillisecondClock()
 	{
 		unsigned long keyState = 0;
-		for (int n=0; n < mNumPinToKeyAssigments; n++)
+		for (size_t n=0; n < mNumPinToKeyAssigments; n++)
 		{
 			int pinNumber = mPinToKeyAssignments[n].pinNumber;
-			if (digitalRead(pinNumber) == HIGH)
+			if (digitalRead(pinNumber) == LOW)
 			{
 				keyState = keyState | (1 << n);
 			}
@@ -98,14 +98,13 @@ namespace Atomic
 				mTimeLastKeyStateChange = 0;
 
 				uint32_t keymask = 1;
-				for (int i=1; i<=mNumPinToAnalogInputAssigments; i++)
+				for (size_t i=0; i<mNumPinToKeyAssigments; i++)
 				{
 					if ((mSavedKeyState ^ keyState) & keymask)
 					{
 						bool up = (keyState & keymask) == 0;
-						Serial.print("raw joystick key event "); Serial.print(i); Serial.print(", raw key id: "); Serial.println(mPinToKeyAssignments[i].keyId);
-						//RawKeyEvent rawKeyEvent(mPinToKeyAssignments[i].keyId, up);
-						//EventController::GetInstance()->BroadcastEvent(rawKeyEvent);
+						RawKeyEvent rawKeyEvent(mPinToKeyAssignments[i].keyId, up);
+						EventController::GetInstance()->BroadcastEvent(rawKeyEvent);
 					}
 					keymask <<= 1;
 				}

@@ -1,4 +1,4 @@
-// PanelButtonsController.cpp
+// TimerController.cpp
 
 #include "Event.h"
 #include "TimerController.h"
@@ -38,7 +38,14 @@ namespace Atomic
 	//	Timer
 	void TimerController::HandleTimer()
 	{
-    static MillisecondClockEvent millisecondClockEvent;
-    EventController::GetInstance()->BroadcastEvent(millisecondClockEvent);
+		static MillisecondClockEvent millisecondClockEvent;
+		EventController::GetInstance()->BroadcastEvent(millisecondClockEvent);
+		static SecondClockEvent secondClockEvent;
+		static uint32_t lastSecondTime = millis();
+		if (millis() > lastSecondTime + 1000)
+		{
+			EventController::GetInstance()->BroadcastEvent(secondClockEvent);
+			lastSecondTime = millis();
+		}
 	}
 }

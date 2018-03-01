@@ -35,6 +35,7 @@ namespace Atomic
 			MidiStop,
 			MidiContinue,
 			MillisecondClock,
+			SecondClock,
 			MidiClock,
 			KeyPress,
 			RawKey,
@@ -98,6 +99,11 @@ namespace Atomic
 	class MidiClockEvent : public Event
 	{
 		EventType GetEventType() const { return Event::MidiClock; }
+	};
+
+	class SecondClockEvent : public Event
+	{
+		EventType GetEventType() const { return Event::SecondClock; }
 	};
 
 	class MillisecondClockEvent : public Event
