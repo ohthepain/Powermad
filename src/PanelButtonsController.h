@@ -1,7 +1,7 @@
 // PanelButtonsController
 
 #include <list>
-#include <assert.h>
+#include <myassert.h>
 
 class IntervalTimer;
 
@@ -12,7 +12,7 @@ namespace Atomic
 		public:
 			static void Init();
 			static void Shutdown();
-			static PanelButtonsController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
+			static PanelButtonsController* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
       		int HandleTimer();
       		void HandleRawKeyEvent(const Event& event);

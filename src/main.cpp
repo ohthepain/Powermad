@@ -1,6 +1,6 @@
 // xfacetest.ino
 
-#include "Event.h"
+#include "MidiEvent.h"
 #include "TimerController.h"
 #include "TempoMonitor.h"
 #include "PanelButtonsController.h"
@@ -14,6 +14,11 @@
 #include "SeqViewLcd.h"
 #include "ArpViewLcd.h"
 #include "GateViewLcd.h"
+#include "MidiManager.h"
+#include "UsbMidiController.h"
+#include <usb_midi.h>
+#include <Arduino.h>
+#include "myassert.h"
 
 #define LED 13
 
@@ -34,6 +39,10 @@ void setup()
   Atomic::InputPinManager::GetInstance()->AddAnalogInputPin(22, Atomic::Event::RightJoystickY);
   Atomic::InputPinManager::GetInstance()->AddDigitalInputPin(23, Atomic::Event::RightJoystickButton);
   Atomic::LcdDisplayController::Init();
+  Atomic::MidiManager::Init();
+ 	#ifdef USB_MIDI
+  Atomic::UsbMidiController::Init();
+  #endif
 
   Atomic::SongViewLcd::Init();
   Atomic::SeqViewLcd::Init();

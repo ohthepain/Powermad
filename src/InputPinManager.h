@@ -4,7 +4,7 @@
 
 #include "Event.h"
 #include <stdint.h>
-#include <assert.h>
+#include <myassert.h>
 
 namespace Atomic
 {
@@ -25,7 +25,7 @@ namespace Atomic
 	public:
 		static void Init();
 		static void Shutdown();
-		static InputPinManager* GetInstance() { assert(mInstance != nullptr); return mInstance; }
+		static InputPinManager* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
 		void AddDigitalInputPin(int pinNumber, Event::KeyId rawButtonNumber);
 		void AddAnalogInputPin(int pinNumber, tAnalogInputId analogInputId);

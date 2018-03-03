@@ -1,6 +1,6 @@
 // TimerController.h
 
-#include <assert.h>
+#include <myassert.h>
 
 class IntervalTimer;
 class EventController;
@@ -12,7 +12,7 @@ namespace Atomic
 		public:
 			static void Init();
 			static void Shutdown();
-			static TimerController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
+			static TimerController* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
 		private:
 			TimerController();

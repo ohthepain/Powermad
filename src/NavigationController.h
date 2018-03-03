@@ -4,8 +4,8 @@
 
 #include <stdint.h>
 #include "Song.h"
-#include "Event.h"
-#include <assert.h>
+#include "MidiEvent.h"
+#include <myassert.h>
 
 namespace Atomic
 {
@@ -14,9 +14,10 @@ namespace Atomic
 	public:
 		static void Init();
 		static void Shutdown();
-		static NavigationController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
+		static NavigationController* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
 		Song* GetSong() { return mSong; }
+		Sequence* GetCurrentSequence() { return mCurrentSequence; }
 
 	private:
 		static NavigationController* mInstance;
@@ -27,5 +28,6 @@ namespace Atomic
 		void HandleKeyPressEvent(const Event& event);
 
 		Song* mSong;
+		Sequence* mCurrentSequence;
 	};
 }

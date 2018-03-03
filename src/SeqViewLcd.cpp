@@ -2,6 +2,9 @@
 
 #include "SeqViewLcd.h"
 #include "LcdDisplayController.h"
+#include "MidiManager.h"
+#include "Song.h"
+#include "NavigationController.h"
 #include <Arduino.h>
 
 namespace Atomic
@@ -10,13 +13,13 @@ namespace Atomic
 	
 	void SeqViewLcd::Init()
 	{
-		assert(mInstance == nullptr);
+		myassert(mInstance == nullptr);
 		mInstance = new SeqViewLcd();
 	}
 
 	void SeqViewLcd::Shutdown()
 	{
-		assert(mInstance != nullptr);
+		myassert(mInstance != nullptr);
 		delete mInstance;
 		mInstance = nullptr;
 	}
@@ -24,8 +27,9 @@ namespace Atomic
 	SeqViewLcd::SeqViewLcd()
 	{
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleEvent(event); return 0; };
-		EventController::GetInstance()->AddEventHandler(EventType::SystemRealTimeMessage, handler);
-		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::MidiSystemRealTimeMessage, handler);
+		//EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::RawKey, handler);
 		EventController::GetInstance()->AddEventHandler(EventType::SetView, handler);
 	}
 
@@ -38,26 +42,54 @@ namespace Atomic
 			lcdDisplayController->Clear();
 			lcdDisplayController->WriteToScreen(0, 0, "Seq");
 			break;
-		case EventType::MidiNote:
-			lcdDisplayController->WriteToScreen(19, 1, "N");
-			break;
-		case EventType::SystemRealTimeMessage:
+		case EventType::MidiChannelMessage:
 		{
-			const SystemRealTimeMessage& systemRealTimeMessage = static_cast<const SystemRealTimeMessage&>(event);
-			SystemRealTimeMessageId systemRealTimeMessageId = systemRealTimeMessage.GetSystemRealTimeMessageId();
+			const MidiChannelMessageEvent& midiChannelMessageEvent = static_cast<const MidiChannelMessageEvent&>(event);
+			const char* s = "Z";
+			switch (midiChannelMessageEvent.GetMidiChannelMessageEventId())
+			{
+				case MidiChannelMessageEventId::NoteOn:
+					s = "N";
+					break;
+				case MidiChannelMessageEventId::NoteOff:
+					s = "O";
+					break;
+				case MidiChannelMessageEventId::ControlChange:
+					s = "C";
+					break;
+				case MidiChannelMessageEventId::AfterTouchPoly:
+					s = "A";
+					break;
+				case MidiChannelMessageEventId::ProgramChange:
+					s = "P";
+					break;
+				case MidiChannelMessageEventId::AfterTouchChannel:
+					s = "X";
+					break;
+				case MidiChannelMessageEventId::PitchBend:
+					s = "B";
+					break;
+			}
+			lcdDisplayController->WriteToScreen(19, 1, s);
+			break;
+		}
+		case EventType::MidiSystemRealTimeMessage:
+		{
+			const MidiSystemRealTimeMessage& systemRealTimeMessage = static_cast<const MidiSystemRealTimeMessage&>(event);
+			MidiSystemRealTimeMessageId systemRealTimeMessageId = systemRealTimeMessage.GetSystemRealTimeMessageId();
 			switch (systemRealTimeMessageId)
 			{
-			case SystemRealTimeMessageId::TimingClock:
+			case MidiSystemRealTimeMessageId::TimingClock:
 				HandleMidiClock();
 				break;
-			case SystemRealTimeMessageId::Start:
+			case MidiSystemRealTimeMessageId::Start:
 				lcdDisplayController->WriteToScreen(19, 0, "P");
 				break;
-			case SystemRealTimeMessageId::Stop:
+			case MidiSystemRealTimeMessageId::Stop:
 				lcdDisplayController->WriteToScreen(19, 1, "S");
 				Serial.println("Event: MidiStop");
 				break;
-			case SystemRealTimeMessageId::Continue:
+			case MidiSystemRealTimeMessageId::Continue:
 				lcdDisplayController->WriteToScreen(19, 1, "C");
 				Serial.println("Event: MidiContinue");
 				break;
@@ -69,11 +101,63 @@ namespace Atomic
 		case EventType::MillisecondClock:
 			//Serial.println("Event: MillisecondClock");
 			break;
-		case EventType::KeyPress:
-			//Serial.println("Event: KeyPress");
+		case EventType::RawKey:
+		{
+			const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
+			Serial.print("SEq Event: RawKey: "); Serial.print(rawKeyEvent.GetKeyId());
+			if (rawKeyEvent.GetUp())
+			{
+				Serial.print(" up");
+			}
+			Serial.println("");
+			int keyId = rawKeyEvent.GetKeyId();
+			bool up = rawKeyEvent.GetUp();
+			int notenum = 0;
+			switch (keyId)
+			{
+				case Event::Note1:
+					notenum = 60;
+					break;
+				case Event::Note2:
+					notenum = 61;
+					break;
+				case Event::Note3:
+					notenum = 62;
+					break;
+				case Event::Note4:
+					notenum = 63;
+					break;
+				case Event::Note5:
+					notenum = 64;
+					break;
+				case Event::Note6:
+					notenum = 65;
+					break;
+				case Event::Note7:
+					notenum = 66;
+					break;
+				case Event::Note8:
+					notenum = 67;
+					break;
+				default:
+					break;
+			}
+			if (notenum != 0)
+			{
+				Sequence* sequence = NavigationController::GetInstance()->GetCurrentSequence();
+				if (up)
+				{
+					MidiManager::GetInstance()->SendNoteOff(sequence->GetMidiSourceId(), sequence->GetMidiChannel(), notenum, 0);
+				}
+				else
+				{
+					MidiManager::GetInstance()->SendNoteOn(sequence->GetMidiSourceId(), sequence->GetMidiChannel(), notenum, 100);
+				}
+			}
 			break;
+		}
 		default:
-			assert(0 && "SeqViewLcd: unhandled event");
+			myassert(0 && "SeqViewLcd: unhandled event");
 		}
 	}
 

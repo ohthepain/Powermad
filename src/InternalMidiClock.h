@@ -1,7 +1,7 @@
 // PanelButtonsController
 
-#include "Event.h"
-#include <assert.h>
+#include "MidiEvent.h"
+#include <myassert.h>
 
 class IntervalTimer;
 
@@ -12,7 +12,7 @@ namespace Atomic
 		public:
 			static void Init();
 			static void Shutdown();
-			static InternalMidiClock* GetInstance() { assert(mInstance != nullptr); return mInstance; }
+			static InternalMidiClock* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
 		private:
 			static InternalMidiClock* mInstance;

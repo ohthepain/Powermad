@@ -10,13 +10,13 @@ namespace Atomic
 
 	void PanelButtonsController::Init()
 	{
-		assert(mInstance == nullptr);
+		myassert(mInstance == nullptr);
 		mInstance = new PanelButtonsController();
 	}
 
 	void PanelButtonsController::Shutdown()
 	{
-		assert(mInstance != nullptr);
+		myassert(mInstance != nullptr);
 		delete mInstance;
 		mInstance = nullptr;
 	}
@@ -64,11 +64,7 @@ namespace Atomic
 		return keyStates;
 	}
 
-  static uint8_t ButtonInfo = {
-    
-  };
-
-  void PanelButtonsController::HandleRawKeyEvent(const Event& event)
+	void PanelButtonsController::HandleRawKeyEvent(const Event& event)
   {
 		static bool shift = false;
 		const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);

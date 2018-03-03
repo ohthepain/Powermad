@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Event.h"
-#include <assert.h>
+#include "MidiEvent.h"
+#include <myassert.h>
 class LiquidCrystal;
 
 namespace Atomic
@@ -13,10 +13,11 @@ namespace Atomic
 		public:
 			static void Init();
 			static void Shutdown();
-			static LcdDisplayController* GetInstance() { assert(mInstance != nullptr); return mInstance; }
+			static LcdDisplayController* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
 			void WriteToScreen(int x, int y, const char* string);
 			void WriteToScreen(int x, int y, int n);
+			void WriteToScreen(int x, int y, char c);
 			void Clear();
 
 		private:

@@ -31,20 +31,20 @@ namespace Atomic
 
 	void InputPinManager::Init()
 	{
-		assert(mInstance == nullptr);
+		myassert(mInstance == nullptr);
 		mInstance = new InputPinManager();
 	}
 
 	void InputPinManager::Shutdown()
 	{
-		assert(mInstance == nullptr);
+		myassert(mInstance == nullptr);
 		delete mInstance;
 		mInstance = nullptr;
 	}
 
 	void InputPinManager::AddDigitalInputPin(int pinNumber, Event::KeyId rawButtonNumber)
 	{
-		assert(mNumPinToKeyAssigments < kMaxPinToKeyAssignments);
+		myassert(mNumPinToKeyAssigments < kMaxPinToKeyAssignments);
 		mPinToKeyAssignments[mNumPinToKeyAssigments].pinNumber = pinNumber;
 		mPinToKeyAssignments[mNumPinToKeyAssigments].keyId = rawButtonNumber;
 		++mNumPinToKeyAssigments;
@@ -54,7 +54,7 @@ namespace Atomic
 
 	void InputPinManager::AddAnalogInputPin(int pinNumber, tAnalogInputId analogInputId)
 	{
-		assert(mNumPinToAnalogInputAssigments < kMaxPinToAnalogInputAssignments);
+		myassert(mNumPinToAnalogInputAssigments < kMaxPinToAnalogInputAssignments);
 		mPinToAnalogInputAssigments[mNumPinToAnalogInputAssigments].pinNumber = pinNumber;
 		mPinToAnalogInputAssigments[mNumPinToAnalogInputAssigments].analogInputId = analogInputId;
 		++mNumPinToAnalogInputAssigments;
@@ -72,7 +72,7 @@ namespace Atomic
 				return val;
 			}
 		}
-		assert(false && "unregistered analog input");
+		myassert(false && "unregistered analog input");
 	}
 
 	void InputPinManager::HandleMillisecondClock()

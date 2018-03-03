@@ -12,7 +12,6 @@ namespace Atomic
 	{
 		mEventController = EventController::GetInstance();
 
-		Serial.println("Start timer");
 		mTimer = new IntervalTimer();
 		mTimer->begin(TimerController::HandleTimer, 1000);
 	}

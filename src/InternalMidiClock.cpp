@@ -44,13 +44,13 @@ namespace Atomic
 		{
 			case Event::Play:
 			{
-				static SystemRealTimeMessage systemRealTimeMessage(SystemRealTimeMessageId::Continue);
+				static MidiSystemRealTimeMessage systemRealTimeMessage(MidiSystemRealTimeMessageId::Continue, MidiSourceId::Internal);
 				EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);
 				break;
 			}
 			case Event::Stop:
 			{
-				static SystemRealTimeMessage systemRealTimeMessage(SystemRealTimeMessageId::Stop);
+				static MidiSystemRealTimeMessage systemRealTimeMessage(MidiSystemRealTimeMessageId::Stop, MidiSourceId::Internal);
 				EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);
 				break;
 			}
@@ -69,7 +69,7 @@ namespace Atomic
 		if (currentTime - mLastMidiPulseTime >= msecPerPulse)
 		{
 			mLastMidiPulseTime += msecPerPulse;
-			static SystemRealTimeMessage systemRealTimeMessage(SystemRealTimeMessageId::TimingClock);
+			static MidiSystemRealTimeMessage systemRealTimeMessage(MidiSystemRealTimeMessageId::TimingClock, MidiSourceId::Internal);
 			EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);	
 		}
 	}

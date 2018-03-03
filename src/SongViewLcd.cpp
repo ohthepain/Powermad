@@ -10,13 +10,13 @@ namespace Atomic
 	
 	void SongViewLcd::Init()
 	{
-		assert(mInstance == nullptr);
+		myassert(mInstance == nullptr);
 		mInstance = new SongViewLcd();
 	}
 
 	void SongViewLcd::Shutdown()
 	{
-		assert(mInstance != nullptr);
+		myassert(mInstance != nullptr);
 		delete mInstance;
 		mInstance = nullptr;
 	}
@@ -24,7 +24,7 @@ namespace Atomic
 	SongViewLcd::SongViewLcd()
 	{
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleEvent(event); return 0; };
-		EventController::GetInstance()->AddEventHandler(EventType::SystemRealTimeMessage, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::MidiSystemRealTimeMessage, handler);
 		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
 		EventController::GetInstance()->AddEventHandler(EventType::SetView, handler);
 	}
@@ -38,26 +38,54 @@ namespace Atomic
 			lcdDisplayController->Clear();
 			lcdDisplayController->WriteToScreen(0, 0, "Song");
 			break;
-		case EventType::MidiNote:
-			lcdDisplayController->WriteToScreen(19, 1, "N");
-			break;
-		case EventType::SystemRealTimeMessage:
+		case EventType::MidiChannelMessage:
 		{
-			const SystemRealTimeMessage& systemRealTimeMessage = static_cast<const SystemRealTimeMessage&>(event);
-			SystemRealTimeMessageId systemRealTimeMessageId = systemRealTimeMessage.GetSystemRealTimeMessageId();
+			const MidiChannelMessageEvent& midiChannelMessageEvent = static_cast<const MidiChannelMessageEvent&>(event);
+			const char* s = "Z";
+			switch (midiChannelMessageEvent.GetMidiChannelMessageEventId())
+			{
+				case MidiChannelMessageEventId::NoteOn:
+					s = "N";
+					break;
+				case MidiChannelMessageEventId::NoteOff:
+					s = "O";
+					break;
+				case MidiChannelMessageEventId::ControlChange:
+					s = "C";
+					break;
+				case MidiChannelMessageEventId::AfterTouchPoly:
+					s = "A";
+					break;
+				case MidiChannelMessageEventId::ProgramChange:
+					s = "P";
+					break;
+				case MidiChannelMessageEventId::AfterTouchChannel:
+					s = "X";
+					break;
+				case MidiChannelMessageEventId::PitchBend:
+					s = "B";
+					break;
+			}
+			lcdDisplayController->WriteToScreen(19, 1, s);
+			break;
+		}
+		case EventType::MidiSystemRealTimeMessage:
+		{
+			const MidiSystemRealTimeMessage& systemRealTimeMessage = static_cast<const MidiSystemRealTimeMessage&>(event);
+			MidiSystemRealTimeMessageId systemRealTimeMessageId = systemRealTimeMessage.GetSystemRealTimeMessageId();
 			switch (systemRealTimeMessageId)
 			{
-			case SystemRealTimeMessageId::TimingClock:
+			case MidiSystemRealTimeMessageId::TimingClock:
 				HandleMidiClock();
 				break;
-			case SystemRealTimeMessageId::Start:
+			case MidiSystemRealTimeMessageId::Start:
 				lcdDisplayController->WriteToScreen(19, 0, "P");
 				break;
-			case SystemRealTimeMessageId::Stop:
+			case MidiSystemRealTimeMessageId::Stop:
 				lcdDisplayController->WriteToScreen(19, 1, "S");
 				Serial.println("Event: MidiStop");
 				break;
-			case SystemRealTimeMessageId::Continue:
+			case MidiSystemRealTimeMessageId::Continue:
 				lcdDisplayController->WriteToScreen(19, 1, "C");
 				Serial.println("Event: MidiContinue");
 				break;
@@ -73,7 +101,7 @@ namespace Atomic
 			//Serial.println("Event: KeyPress");
 			break;
 		default:
-			assert(0 && "SongViewLcd: unhandled event");
+			myassert(0 && "SongViewLcd: unhandled event");
 		}
 	}
 

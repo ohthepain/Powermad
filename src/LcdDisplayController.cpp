@@ -1,6 +1,6 @@
 // LcdDisplayController.cpp
 
-#include "Event.h"
+#include "MidiEvent.h"
 #include "LcdDisplayController.h"
 #include <Arduino.h>
 #include <LiquidCrystal.h>
@@ -93,6 +93,12 @@ namespace Atomic
 	{
 		mLiquidCrystal->setCursor(x, y);
 		mLiquidCrystal->print(n);
+	}
+
+	void LcdDisplayController::WriteToScreen(int x, int y, char c)
+	{
+		mLiquidCrystal->setCursor(x, y);
+		mLiquidCrystal->print(c);
 	}
 
 	void LcdDisplayController::Clear()

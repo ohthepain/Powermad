@@ -1,7 +1,7 @@
 // PanelButtonsController
 
-#include "Event.h"
-#include <assert.h>
+#include "MidiEvent.h"
+#include <myassert.h>
 
 class IntervalTimer;
 class NavigationManager;
@@ -13,7 +13,7 @@ namespace Atomic
 		public:
 			static void Init();
 			static void Shutdown();
-			static TempoMonitor* GetInstance() { assert(mInstance != nullptr); return mInstance; }
+			static TempoMonitor* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
 		private:
 			static TempoMonitor* mInstance;
@@ -22,6 +22,6 @@ namespace Atomic
 			TempoMonitor();
 			virtual ~TempoMonitor() {}
 
-			void HandleSystemRealTimeMessage(const Event&);
+			void HandleMidiSystemRealTimeMessage(const Event&);
 	};
 }

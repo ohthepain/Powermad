@@ -1,7 +1,7 @@
 // Event.cpp
 
 #include "Event.h"
-#include <assert.h>
+#include <myassert.h>
 #include <Arduino.h>
 
 namespace std {
@@ -53,7 +53,7 @@ namespace Atomic
         mNodes[i] = mNodes[i+1];
       }
     }
-    assert(found);
+    myassert(found);
     if (found)
     {
       --mSize;
@@ -62,7 +62,7 @@ namespace Atomic
   
   template <class T> T& Vector<T>::operator[](int index)
   {
-    assert((size_t)index < mSize);
+    myassert((size_t)index < mSize);
     return mNodes[index];
   }
 
@@ -99,7 +99,7 @@ namespace Atomic
 	void EventController::AddEventHandler(EventType eventType, EventHandler eventHandler)
 	{
     int eventTypeInt = static_cast<int>(eventType);
-    assert(!mBusy);
+    myassert(!mBusy);
 		if (mBusy)
 		{
       Serial.println("AddEventHandler: busy");

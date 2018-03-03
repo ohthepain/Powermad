@@ -9,13 +9,13 @@ namespace Atomic
 	
 	void EventMonitor::Init()
 	{
-		assert(mInstance == nullptr);
+		myassert(mInstance == nullptr);
 		mInstance = new EventMonitor();
 	}
 
 	void EventMonitor::Shutdown()
 	{
-		assert(mInstance != nullptr);
+		myassert(mInstance != nullptr);
 		delete mInstance;
 		mInstance = nullptr;
 	}
@@ -23,11 +23,11 @@ namespace Atomic
 	EventMonitor::EventMonitor()
 	{
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleEvent(event); return 0; };
-		EventController::GetInstance()->AddEventHandler(EventType::SystemRealTimeMessage, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::MidiSystemRealTimeMessage, handler);
 		//EventController::GetInstance()->AddEventHandler(EventType::MillisecondClock, handler);
 		//EventController::GetInstance()->AddEventHandler(EventType::MidiClock, handler);
-		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
-		//EventController::GetInstance()->AddEventHandler(EventType::RawKey, handler);
+		//EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::RawKey, handler);
 	}
 
 	EventMonitor::~EventMonitor()
@@ -38,8 +38,8 @@ namespace Atomic
 	{
 		switch (event.GetEventType())
 		{
-		case EventType::SystemRealTimeMessage:
-			//Serial.println("Event: SystemRealTimeMessage");
+		case EventType::MidiSystemRealTimeMessage:
+			//Serial.println("Event: MidiSystemRealTimeMessage");
 			break;
 		case EventType::MillisecondClock:
 			Serial.println("Event: MillisecondClock");
@@ -50,11 +50,16 @@ namespace Atomic
 		case EventType::RawKey:
 		{
 			const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
-			Serial.print("Event: RawKey: "); Serial.println(rawKeyEvent.GetKeyId());
+			Serial.print("Event: RawKey: "); Serial.print(rawKeyEvent.GetKeyId());
+			if (rawKeyEvent.GetUp())
+			{
+				Serial.print(" up");
+			}
+			Serial.println("");
 			break;
 		}
 		default:
-			assert(0 && "Illegal event type");
+			myassert(0 && "Illegal event type");
 		}
 	}
 }

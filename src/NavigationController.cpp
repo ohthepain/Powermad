@@ -11,6 +11,7 @@ namespace Atomic
 	NavigationController::NavigationController()
 	{
 		mSong = new Song();
+		mCurrentSequence = new Sequence();
 
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleKeyPressEvent(event); return 0; };
 		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
