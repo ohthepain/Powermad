@@ -144,14 +144,20 @@ namespace Atomic
 			}
 			if (notenum != 0)
 			{
-				Sequence* sequence = NavigationController::GetInstance()->GetCurrentSequence();
+				TrackId trackId = NavigationController::GetInstance()->GetCurrentTrackId();
+				//const TrackPlayer* trackPlayer = SongPlayer::GetInstance()->GetTrackPlayer(trackId);
+				//myassert(trackPlayer);
+				Song* song = NavigationController::GetInstance()->GetCurrentSong();
+				myassert(song);
+				const Track* track = song->GetTrack(trackId);
+				myassert(track);
 				if (up)
 				{
-					MidiManager::GetInstance()->SendNoteOff(sequence->GetMidiSourceId(), sequence->GetMidiChannel(), notenum, 0);
+					MidiManager::GetInstance()->SendNoteOff(track->GetMidiSourceId(), track->GetMidiChannel(), notenum, 0);
 				}
 				else
 				{
-					MidiManager::GetInstance()->SendNoteOn(sequence->GetMidiSourceId(), sequence->GetMidiChannel(), notenum, 100);
+					MidiManager::GetInstance()->SendNoteOn(track->GetMidiSourceId(), track->GetMidiChannel(), notenum, 100);
 				}
 			}
 			break;

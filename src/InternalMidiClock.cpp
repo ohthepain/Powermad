@@ -62,7 +62,7 @@ namespace Atomic
 	void InternalMidiClock::HandleMillisecondEvent()
 	{
 		static NavigationController* navigationController = NavigationController::GetInstance();
-		double tempo = navigationController->GetSong()->GetTempo();
+		double tempo = navigationController->GetCurrentSong()->GetTempo();
 		// 16 pulses per quarter note
 		double msecPerPulse = (tempo * (double) 1000) / 16 / 60 / 4;
 		double currentTime = (double)millis();

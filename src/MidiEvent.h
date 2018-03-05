@@ -12,6 +12,8 @@ namespace Atomic
 		MidiPort,
 	};
 
+	typedef uint8_t MidiChannel;
+
 	class MidiEvent : public Event
 	{
 	public:

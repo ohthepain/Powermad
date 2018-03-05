@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include "Song.h"
+#include "SongPlayer.h"
 #include "MidiEvent.h"
 #include <myassert.h>
 
@@ -16,8 +17,12 @@ namespace Atomic
 		static void Shutdown();
 		static NavigationController* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
-		Song* GetSong() { return mSong; }
-		Sequence* GetCurrentSequence() { return mCurrentSequence; }
+		// Returns non-const pointer to current song - you can't get this through the NavigationController
+		Song* GetCurrentSong() const { return mCurrentSong; }
+		TrackId GetCurrentTrackId() const { return mCurrentTrackId; }
+		// Get trackplayers through SongPlayer
+		//TrackPlayer* GetCurrentTrackPlayer() const { return mCurrentSong->GetTrackPlayer(mCurrentTrackId); }
+		MidiSongPositionPointer GetCurrentMidiSongPositionPointer() const { return mMidiSongPositionPointer; }
 
 	private:
 		static NavigationController* mInstance;
@@ -27,7 +32,9 @@ namespace Atomic
 
 		void HandleKeyPressEvent(const Event& event);
 
-		Song* mSong;
-		Sequence* mCurrentSequence;
+		Song* mCurrentSong;
+		SongPlayer* mSongPlayer;
+		TrackId mCurrentTrackId;
+		MidiSongPositionPointer mMidiSongPositionPointer;
 	};
 }

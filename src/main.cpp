@@ -16,6 +16,7 @@
 #include "GateViewLcd.h"
 #include "MidiManager.h"
 #include "UsbMidiController.h"
+#include "SongPlayer.h"
 #include <usb_midi.h>
 #include <Arduino.h>
 #include "myassert.h"
@@ -43,6 +44,7 @@ void setup()
  	#ifdef USB_MIDI
   Atomic::UsbMidiController::Init();
   #endif
+  Atomic::SongPlayer::Init();
 
   Atomic::SongViewLcd::Init();
   Atomic::SeqViewLcd::Init();

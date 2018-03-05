@@ -10,8 +10,9 @@ namespace Atomic
 
 	NavigationController::NavigationController()
 	{
-		mSong = new Song();
-		mCurrentSequence = new Sequence();
+		mCurrentSong = new Song();
+		SongPlayer::GetInstance()->SetSong(mCurrentSong);
+		mCurrentTrackId = 0;
 
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleKeyPressEvent(event); return 0; };
 		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
@@ -19,8 +20,8 @@ namespace Atomic
 
 	NavigationController::~NavigationController()
 	{
-		delete mSong;
-		mSong = nullptr;
+		delete mCurrentSong;
+		mCurrentSong = nullptr;
 	}
 
 	void NavigationController::Init()

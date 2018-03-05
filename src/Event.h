@@ -2,30 +2,13 @@
 
 #pragma once
 
+#include "Vector.h"
 #include <stdint.h>
 #include <functional>
 #include <myassert.h>
 
 namespace Atomic
 {
-	template<class T> class Vector
-	{
-	public:
-		Vector();
-		~Vector();
-
-		void Add(T value);
-		void Remove(T value);
-		T& operator[](int index);
-		void Clear();
-		size_t GetSize() { return mSize; }
-
-	private:
-		T* mNodes;
-		size_t mSize;
-		size_t mCapacity;
-	};
-
 	enum class EventType {
 		MillisecondClock,
 		SecondClock,
