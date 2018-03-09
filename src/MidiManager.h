@@ -5,7 +5,6 @@
 #include <myassert.h>
 #include "MidiEvent.h"
 
-class UsbMidiManager;
 class EventController;
 
 namespace Atomic

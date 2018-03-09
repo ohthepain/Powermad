@@ -10,12 +10,23 @@ namespace Atomic
 
 	NavigationController::NavigationController()
 	{
+		Serial.println("NavigationController: Create song");
+delay(500);
 		mCurrentSong = new Song();
+		Serial.println("NavigationController: set song");
+delay(500);
+		CreateSong();
 		SongPlayer::GetInstance()->SetSong(mCurrentSong);
+		Serial.println("NavigationController: set track id");
+delay(500);
 		mCurrentTrackId = 0;
 
+		Serial.println("NavigationController: add keypress handler");
+delay(500);
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleKeyPressEvent(event); return 0; };
 		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
+		Serial.println("NavigationController: bye");
+delay(500);
 	}
 
 	NavigationController::~NavigationController()
@@ -33,6 +44,25 @@ namespace Atomic
 	{
 		delete mInstance;
 		mInstance = nullptr;
+	}
+
+	void NavigationController::CreateSong()
+	{
+		const int kNumTracksDefault = 8;
+		Song* song = new Song();
+		for (int i=0; i<kNumTracksDefault; i++)
+		{
+			song->AddGate(new Gate(i));
+			song->AddArp(new Arp(i));
+			song->AddSequence(new Sequence(i));
+			song->AddTrack(new Track(i));
+
+			song->GetArp(i)->SetGateId(i);
+			song->GetSequence(i)->SetArpId(i);
+			song->GetTrack(i)->SetSequenceId(i);
+			song->GetTrack(i)->SetMidiChannel(i + 1);
+		}
+		mCurrentSong = song;
 	}
 
 	void NavigationController::HandleKeyPressEvent(const Event& event)

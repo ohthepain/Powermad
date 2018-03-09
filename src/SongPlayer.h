@@ -11,13 +11,15 @@ namespace Atomic
 	class Player
 	{
 	public:
-		Player(const SongPlayer* songPlayer, const Player* parent, TrackId trackId) : mSongPlayer(songPlayer), mParent(parent) {}
+		Player(const SongPlayer* songPlayer, TrackId trackId) : mSongPlayer(songPlayer), mTrackId(trackId) {}
 		virtual ~Player() {}
 		const Player* GetParent() const { myassert(mParent != nullptr); return mParent; }
+		void SetParent(Player* parent) { mParent = parent; }
 		const SongPlayer* GetSongPlayer() const { myassert(mSongPlayer != nullptr); return mSongPlayer; }
 		const Song* GetSong() const;
-		virtual MidiSourceId GetMidiSourceId() const { myassert(mParent); myassert(mParent != this); return mParent->GetMidiSourceId(); }
-		virtual MidiChannel GetMidiChannel() const { myassert(mParent); myassert(mParent != this); return mParent->GetMidiChannel(); }
+		TrackId GetTrackId() const { return mTrackId; }
+		virtual MidiSourceId GetMidiSourceId() const;
+		virtual MidiChannel GetMidiChannel() const;
 
 		virtual void Update(uint32_t midiClocks) = 0;
 
@@ -30,11 +32,14 @@ namespace Atomic
 	class GatePlayer : public Player
 	{
 	public:
-		GatePlayer(const SongPlayer* songPlayer, const Player* parent, TrackId trackId);
+		GatePlayer(const SongPlayer* songPlayer, TrackId trackId);
 		virtual ~GatePlayer() {}		
 
 		void Update(uint32_t midiClocks) {}
-		void SetGate(Gate* gate) { mGate = gate; }
+		void SetGate(const Gate* gate) { mGate = gate; }
+
+		void NoteOn(uint8_t note, uint8_t velocity);
+		void NoteOff(uint8_t note, uint8_t velocity);
 	private:
 		const Gate* mGate;
 	};
@@ -44,7 +49,7 @@ namespace Atomic
 	public:
 		const uint8_t kMaxNotes = 8;
 
-		ArpPlayer(const SongPlayer* songPlayer, const Player* parent, TrackId trackId);
+		ArpPlayer(const SongPlayer* songPlayer, TrackId trackId);
 		virtual ~ArpPlayer();
 
 		void Update(uint32_t midiClocks);
@@ -53,24 +58,25 @@ namespace Atomic
 		void NoteOn(uint8_t note, uint8_t velocity);
 		void NoteOff(uint8_t note, uint8_t velocity);
 	private:
+		// An arp only has one gate player. The 'envelopes' should be owned by the sequence?
+		GatePlayer* GetGatePlayer();
+
 		const Arp* mArp;
 		uint8_t* mNoteNum;
 		uint8_t* mNoteVelocity;
 		int mCurrentNoteNum;
-		Vector<GatePlayer*> mGatePlayers;
 	};
 
     class TrackPlayer : public Player
     {
     public:
-        TrackPlayer(const SongPlayer* songPlayer, const Player* parent, TrackId trackId);
+        TrackPlayer(const SongPlayer* songPlayer, TrackId trackId);
 		virtual ~TrackPlayer() {}
 
         void SetSongPlayer(SongPlayer* songPlayer) { mSongPlayer = songPlayer; }
-		void SetTrack(Track* track) { mTrack = track; }
+		void SetTrack(const Track* track) { mTrack = track; }
 		const Track* GetTrack() const { return mTrack; }
-		MidiSourceId GetMidiSourceId() const { return mMidiSourceId; }
-		void SetMidiSourceId(MidiSourceId midiSourceId) { mMidiSourceId = midiSourceId; }
+		void SetCurrentSequence(const Sequence* sequence) { mCurrentSequence = sequence; }
 
         void Start();
         void Stop();
@@ -82,9 +88,8 @@ namespace Atomic
     private:
 		const int kMaxArpPlayers = 1;
 		const Track* mTrack;
+		const Sequence* mCurrentSequence;
         const SongPlayer* mSongPlayer;
-		Vector<ArpPlayer*> mArpPlayers;
-		MidiSourceId mMidiSourceId;
     };
 
     class SongPlayer
@@ -98,8 +103,11 @@ namespace Atomic
 		
 		void LoadSong();
 
-        const TrackPlayer* GetTrackPlayer(TrackId trackId) const;
+		GatePlayer* GetGatePlayer(GateId gateId) const { return mGatePlayers[gateId]; }
+		ArpPlayer* GetArpPlayer(ArpId arpId) const { return mArpPlayers[arpId]; }
+        TrackPlayer* GetTrackPlayer(TrackId trackId) const { return mTrackPlayers[trackId]; }
 		void SetSong(const Song* song);
+		void ClearSong();
 		const Song* GetSong() const { return mSong; }
 
         void Start();
@@ -116,7 +124,10 @@ namespace Atomic
         virtual ~SongPlayer();
 
 		const Song* mSong;
-		Vector<TrackPlayer*> mTrackPlayer;
+		Vector<GatePlayer*> mGatePlayers;
+		Vector<ArpPlayer*> mArpPlayers;
+		// No sequence player between track and arp!
+		Vector<TrackPlayer*> mTrackPlayers;
 		bool mIsPlaying;
 		MidiSongPositionPointer mMidiSongPositionPointer;
 		uint32_t mNumMidiClocksFromSpp;

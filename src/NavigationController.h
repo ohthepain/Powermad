@@ -24,6 +24,8 @@ namespace Atomic
 		//TrackPlayer* GetCurrentTrackPlayer() const { return mCurrentSong->GetTrackPlayer(mCurrentTrackId); }
 		MidiSongPositionPointer GetCurrentMidiSongPositionPointer() const { return mMidiSongPositionPointer; }
 
+		void CreateSong();
+
 	private:
 		static NavigationController* mInstance;
 

@@ -16,6 +16,7 @@
 #include "GateViewLcd.h"
 #include "MidiManager.h"
 #include "UsbMidiController.h"
+#include "DinMidiController.h"
 #include "SongPlayer.h"
 #include <usb_midi.h>
 #include <Arduino.h>
@@ -27,12 +28,18 @@ void setup()
 {
   Atomic::EventController::Init();
   Atomic::EventMonitor::Init();
-  Atomic::NavigationController::Init();
   Atomic::PanelButtonsController::Init();
+delay(1000);
+Serial.println("System 4");
   Atomic::TimerController::Init();
+delay(1000);
+Serial.println("System 5");
   Atomic::TempoMonitor::Init();
-  Atomic::InternalMidiClock::Init();
+delay(1000);
+Serial.println("System 7");
   Atomic::InputPinManager::Init();
+delay(1000);
+Serial.println("System 8");
   Atomic::InputPinManager::GetInstance()->AddDigitalInputPin(8, Atomic::Event::RightJoystickButton);
   Atomic::InputPinManager::GetInstance()->AddAnalogInputPin(2, Atomic::Event::RightJoystickX);
   Atomic::InputPinManager::GetInstance()->AddAnalogInputPin(4, Atomic::Event::RightJoystickY);
@@ -40,16 +47,23 @@ void setup()
   Atomic::InputPinManager::GetInstance()->AddAnalogInputPin(22, Atomic::Event::RightJoystickY);
   Atomic::InputPinManager::GetInstance()->AddDigitalInputPin(23, Atomic::Event::RightJoystickButton);
   Atomic::LcdDisplayController::Init();
+
+  Atomic::SongPlayer::Init();
+  Atomic::NavigationController::Init();
+  Atomic::InternalMidiClock::Init();
   Atomic::MidiManager::Init();
  	#ifdef USB_MIDI
+delay(1000);
+Serial.println("System 12a");
   Atomic::UsbMidiController::Init();
   #endif
-  Atomic::SongPlayer::Init();
-
+  Atomic::DinMidiController::Init();
   Atomic::SongViewLcd::Init();
   Atomic::SeqViewLcd::Init();
   Atomic::ArpViewLcd::Init();
   Atomic::GateViewLcd::Init();
+
+  Atomic::NavigationController::GetInstance()->CreateSong();
 }
 
 void loop()

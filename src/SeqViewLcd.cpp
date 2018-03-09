@@ -104,7 +104,7 @@ namespace Atomic
 		case EventType::RawKey:
 		{
 			const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
-			Serial.print("SEq Event: RawKey: "); Serial.print(rawKeyEvent.GetKeyId());
+			Serial.print("Seq Event: RawKey: "); Serial.print(rawKeyEvent.GetKeyId());
 			if (rawKeyEvent.GetUp())
 			{
 				Serial.print(" up");
@@ -144,20 +144,26 @@ namespace Atomic
 			}
 			if (notenum != 0)
 			{
+				// TODO: Handle this outside of SeqView, since all views have the same note on/off functionality
+				// Maybe we need a hierarchicial event handling structure?
 				TrackId trackId = NavigationController::GetInstance()->GetCurrentTrackId();
-				//const TrackPlayer* trackPlayer = SongPlayer::GetInstance()->GetTrackPlayer(trackId);
-				//myassert(trackPlayer);
-				Song* song = NavigationController::GetInstance()->GetCurrentSong();
-				myassert(song);
-				const Track* track = song->GetTrack(trackId);
-				myassert(track);
+				Serial.print("Current track is "); Serial.println(trackId);
+				TrackPlayer* trackPlayer = SongPlayer::GetInstance()->GetTrackPlayer(trackId);
+				Serial.print("Got current track "); Serial.println(trackId);
+				myassert(trackPlayer);
+				//Song* song = NavigationController::GetInstance()->GetCurrentSong();
+				//myassert(song);
+				//const Track* track = trackPlayer->GetTrack();
+				//myassert(track);
 				if (up)
 				{
-					MidiManager::GetInstance()->SendNoteOff(track->GetMidiSourceId(), track->GetMidiChannel(), notenum, 0);
+					trackPlayer->NoteOff(notenum, (uint8_t)0);
+					//MidiManager::GetInstance()->SendNoteOff(track->GetMidiSourceId(), track->GetMidiChannel(), notenum, 0);
 				}
 				else
 				{
-					MidiManager::GetInstance()->SendNoteOn(track->GetMidiSourceId(), track->GetMidiChannel(), notenum, 100);
+					trackPlayer->NoteOn(notenum, (uint8_t)100);
+					//MidiManager::GetInstance()->SendNoteOn(track->GetMidiSourceId(), track->GetMidiChannel(), notenum, 100);
 				}
 			}
 			break;

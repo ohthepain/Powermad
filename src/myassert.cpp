@@ -13,8 +13,24 @@ namespace Atomic
 		lastmillis = millis();
 	}
 
+	void DisplayAssert(const char* file, int line, const char* exp)
+	{
+		Serial.println("Assertion failed:");
+		Serial.print("File: ");
+		Serial.println(file);
+		Serial.print("Line: ");
+		Serial.println(line);
+		Serial.print("Exp: ");
+		Serial.println(exp);		
+	}
+
 	void __attribute__((noreturn)) __my_assert_func(const char* file, int line, const char* exp)
 	{
+		while (1)
+		{
+			delay(1000);
+			DisplayAssert(file, line, exp);
+		}
 		char temp[21];
 		strncpy(temp, exp, 20);
 		Atomic::LcdDisplayController::GetInstance()->Clear();
