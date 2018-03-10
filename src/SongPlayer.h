@@ -21,7 +21,10 @@ namespace Atomic
 		virtual MidiSourceId GetMidiSourceId() const;
 		virtual MidiChannel GetMidiChannel() const;
 
-		virtual void Update(uint32_t midiClocks) = 0;
+		virtual void Start() = 0;
+		virtual void Stop() = 0;
+		virtual void Continue() = 0;
+		virtual void HandleMidiTimingClock(uint32_t midiClocks) = 0;
 
 	private:
 		const SongPlayer* mSongPlayer;
@@ -35,14 +38,25 @@ namespace Atomic
 		GatePlayer(const SongPlayer* songPlayer, TrackId trackId);
 		virtual ~GatePlayer() {}		
 
-		void Update(uint32_t midiClocks) {}
 		void SetGate(const Gate* gate) { mGate = gate; }
+
+		virtual void Start() {}
+		virtual void Stop() {}
+		virtual void Continue() {}
+		void HandleMidiTimingClock(uint32_t midiClocks) {}
 
 		void NoteOn(uint8_t note, uint8_t velocity);
 		void NoteOff(uint8_t note, uint8_t velocity);
 	private:
 		const Gate* mGate;
 	};
+
+	typedef struct {
+		uint32_t startTime;
+		uint32_t duration;
+		uint8_t note;
+		uint8_t velocity;
+	} NoteRecord;
 
 	class ArpPlayer : public Player
 	{
@@ -52,18 +66,22 @@ namespace Atomic
 		ArpPlayer(const SongPlayer* songPlayer, TrackId trackId);
 		virtual ~ArpPlayer();
 
-		void Update(uint32_t midiClocks);
 		void SetArp(const Arp *arp) { mArp = arp; }
+
+		virtual void Start();
+		virtual void Stop() {}
+		virtual void Continue() {}
+		void HandleMidiTimingClock(uint32_t midiClocks);
 
 		void NoteOn(uint8_t note, uint8_t velocity);
 		void NoteOff(uint8_t note, uint8_t velocity);
 	private:
 		// An arp only has one gate player. The 'envelopes' should be owned by the sequence?
 		GatePlayer* GetGatePlayer();
+		void PlayNextNote();
 
 		const Arp* mArp;
-		uint8_t* mNoteNum;
-		uint8_t* mNoteVelocity;
+		Vector<NoteRecord*> mNoteList;
 		int mCurrentNoteNum;
 	};
 
@@ -73,15 +91,14 @@ namespace Atomic
         TrackPlayer(const SongPlayer* songPlayer, TrackId trackId);
 		virtual ~TrackPlayer() {}
 
-        void SetSongPlayer(SongPlayer* songPlayer) { mSongPlayer = songPlayer; }
-		void SetTrack(const Track* track) { mTrack = track; }
+ 		void SetTrack(const Track* track) { mTrack = track; }
 		const Track* GetTrack() const { return mTrack; }
 		void SetCurrentSequence(const Sequence* sequence) { mCurrentSequence = sequence; }
 
-        void Start();
-        void Stop();
-        void Continue();
-		void Update(uint32_t midiClocks);
+		virtual void Start();
+		virtual void Stop();
+		virtual void Continue();
+		virtual void HandleMidiTimingClock(uint32_t midiClocks);
 
 		void NoteOn(uint8_t note, uint8_t velocity);
 		void NoteOff(uint8_t note, uint8_t velocity);
@@ -89,7 +106,6 @@ namespace Atomic
 		const int kMaxArpPlayers = 1;
 		const Track* mTrack;
 		const Sequence* mCurrentSequence;
-        const SongPlayer* mSongPlayer;
     };
 
     class SongPlayer
@@ -101,8 +117,6 @@ namespace Atomic
 		static void Shutdown();
 		static SongPlayer* GetInstance() { myassert(mInstance); return mInstance; }
 		
-		void LoadSong();
-
 		GatePlayer* GetGatePlayer(GateId gateId) const { return mGatePlayers[gateId]; }
 		ArpPlayer* GetArpPlayer(ArpId arpId) const { return mArpPlayers[arpId]; }
         TrackPlayer* GetTrackPlayer(TrackId trackId) const { return mTrackPlayers[trackId]; }
@@ -116,12 +130,14 @@ namespace Atomic
         void SetMidiSongPositionPointer(MidiSongPositionPointer midiSongPositionPointer);
         MidiSongPositionPointer GetMidiSongPositionPointer() const { return mMidiSongPositionPointer; }
 
-		void Update();
+		void HandleMidiTimingClock();
 
     private:
 		static SongPlayer* mInstance;
         SongPlayer();
         virtual ~SongPlayer();
+
+		void HandleMidiSystemRealTimeMessage(const Event& event);
 
 		const Song* mSong;
 		Vector<GatePlayer*> mGatePlayers;
@@ -131,5 +147,6 @@ namespace Atomic
 		bool mIsPlaying;
 		MidiSongPositionPointer mMidiSongPositionPointer;
 		uint32_t mNumMidiClocksFromSpp;
+		double mStartTime;
     };
 }
