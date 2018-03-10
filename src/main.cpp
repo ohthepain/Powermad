@@ -29,17 +29,9 @@ void setup()
   Atomic::EventController::Init();
   Atomic::EventMonitor::Init();
   Atomic::PanelButtonsController::Init();
-delay(1000);
-Serial.println("System 4");
   Atomic::TimerController::Init();
-delay(1000);
-Serial.println("System 5");
   Atomic::TempoMonitor::Init();
-delay(1000);
-Serial.println("System 7");
   Atomic::InputPinManager::Init();
-delay(1000);
-Serial.println("System 8");
   Atomic::InputPinManager::GetInstance()->AddDigitalInputPin(8, Atomic::Event::RightJoystickButton);
   Atomic::InputPinManager::GetInstance()->AddAnalogInputPin(2, Atomic::Event::RightJoystickX);
   Atomic::InputPinManager::GetInstance()->AddAnalogInputPin(4, Atomic::Event::RightJoystickY);

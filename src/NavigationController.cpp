@@ -11,22 +11,16 @@ namespace Atomic
 	NavigationController::NavigationController()
 	{
 		Serial.println("NavigationController: Create song");
-delay(500);
 		mCurrentSong = new Song();
 		Serial.println("NavigationController: set song");
-delay(500);
 		CreateSong();
 		SongPlayer::GetInstance()->SetSong(mCurrentSong);
 		Serial.println("NavigationController: set track id");
-delay(500);
 		mCurrentTrackId = 0;
-
 		Serial.println("NavigationController: add keypress handler");
-delay(500);
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleKeyPressEvent(event); return 0; };
 		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
 		Serial.println("NavigationController: bye");
-delay(500);
 	}
 
 	NavigationController::~NavigationController()

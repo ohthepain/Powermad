@@ -49,13 +49,7 @@ namespace Atomic
 			break;
 		case EventType::RawKey:
 		{
-			const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
-			Serial.print("Event: RawKey: "); Serial.print(rawKeyEvent.GetKeyId());
-			if (rawKeyEvent.GetUp())
-			{
-				Serial.print(" up");
-			}
-			Serial.println("");
+			//const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
 			break;
 		}
 		default:

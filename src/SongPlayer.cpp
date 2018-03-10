@@ -15,25 +15,17 @@ namespace Atomic
 
 	MidiSourceId Player::GetMidiSourceId() const
 	{
-		Serial.print("Player::GetMidiChannel: mSongPlayer "); Serial.println((int)mSongPlayer);
-		Serial.print("Player::GetMidiChannel: mTrackId "); Serial.println((int)mTrackId);
 		myassert(mSongPlayer);
 		const Song* song = GetSong();
-		Serial.print("Player::GetMidiChannel: song @"); Serial.println((int)song);
 		const Track* track = song->GetTrack(mTrackId);
-		Serial.print("Player::GetMidiChannel: track @"); Serial.println((int)track);
 		return track->GetMidiSourceId();
 	}
 
 	MidiChannel Player::GetMidiChannel() const
 	{
-		Serial.print("Player::GetMidiChannel: mSongPlayer "); Serial.println((int)mSongPlayer);
-		Serial.print("Player::GetMidiChannel: mTrackId "); Serial.println((int)mTrackId);
 		myassert(mSongPlayer);
 		const Song* song = GetSong();
-		Serial.print("Player::GetMidiChannel: song @"); Serial.println((int)song);
 		const Track* track = song->GetTrack(mTrackId);
-		Serial.print("Player::GetMidiChannel: track @"); Serial.println((int)track);
 		return track->GetMidiChannel();
 	}
 
