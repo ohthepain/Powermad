@@ -13,6 +13,23 @@ namespace Atomic
 		lastmillis = millis();
 	}
 
+	#ifndef NDEBUG
+	void write()
+	{
+		Serial.println("");
+	}
+
+	void dowrite(const char* s)
+	{
+		Serial.print(s);
+	}
+
+	void dowrite(int i)
+	{
+		Serial.print(i);
+	}
+	#endif
+
 	void DisplayAssert(const char* file, int line, const char* exp)
 	{
 		Serial.println("Assertion failed:");
@@ -24,32 +41,32 @@ namespace Atomic
 		Serial.println(exp);		
 	}
 
-	void __attribute__((noreturn)) __my_assert_func(const char* file, int line, const char* exp)
+	void __attribute__((noreturn)) __my_assert_func(const char* file, int line, const char* exp, const char* msg)
 	{
-		while (1)
-		{
-			delay(1000);
-			DisplayAssert(file, line, exp);
-		}
+		DisplayAssert(file, line, exp);
 		char temp[21];
-		strncpy(temp, exp, 20);
+		if (msg != nullptr)
+		{
+			strncpy(temp, msg, 20);
+		}
+		else
+		{
+			strncpy(temp, exp, 20);
+		}
 		Atomic::LcdDisplayController::GetInstance()->Clear();
 		Atomic::LcdDisplayController::GetInstance()->WriteToScreen(0, 0, "Assert line");
-		delay(1000);
 		Atomic::LcdDisplayController::GetInstance()->WriteToScreen(12, 0, line);
-		delay(1000);
 		Atomic::LcdDisplayController::GetInstance()->WriteToScreen(0, 1, file);
-		delay(1000);
 		Atomic::LcdDisplayController::GetInstance()->WriteToScreen(0, 2, temp);
-		delay(1000);
 		while (true)
 		{
 			Atomic::LcdDisplayController::GetInstance()->WriteToScreen(19, 0, (char)1);
 			Atomic::LcdDisplayController::GetInstance()->WriteToScreen(19, 3, (char)2);
-			delay(500);
+			delay(700);
 			Atomic::LcdDisplayController::GetInstance()->WriteToScreen(19, 0, (char)2);
 			Atomic::LcdDisplayController::GetInstance()->WriteToScreen(19, 3, (char)1);
-			delay(500);
+			delay(700);
+			DisplayAssert(file, line, exp);
 		}
 	}
 }
