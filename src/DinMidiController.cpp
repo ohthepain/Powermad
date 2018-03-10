@@ -50,7 +50,7 @@ namespace Atomic
 	
 	void DinMidiController::SendAfterTouchPoly(int note, int pressure, int channel)
 	{
-		MIDI.sendPolyPressure(note, pressure, channel);
+		//MIDI.sendPolyPressure(note, pressure, channel);
 	}
 	
 	void DinMidiController::SendControlChange(int control, int value, int channel)
