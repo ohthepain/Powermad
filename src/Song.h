@@ -107,7 +107,7 @@ namespace Atomic
         Song();
         virtual ~Song();
 
-        double GetTempo() { return mTempo; }
+        double GetTempo() const { return mTempo; }
 
         // SPP = num midi beats from start. Each MIDI Beat is a 16th note (since there are 24 MIDI Clocks in a quarter note).
         SequenceId GetSequenceIdForTrackAtSpp(TrackId trackId, MidiSongPositionPointer spp) const { return 1; }
