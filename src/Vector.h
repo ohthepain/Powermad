@@ -64,7 +64,7 @@ namespace Atomic
   template<class T> void Vector<T>::Remove(T value)
   {
     bool found = false;
-    for (int i=0; i<mSize; i++)
+    for (size_t i=0; i<mSize; i++)
     {
       found = found || mNodes[i] == value;
       if (found && i < mSize - 1)
