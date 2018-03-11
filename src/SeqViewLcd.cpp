@@ -28,6 +28,7 @@ namespace Atomic
 	{
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleEvent(event); return 0; };
 		EventController::GetInstance()->AddEventHandler(EventType::MidiSystemRealTimeMessage, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::MidiChannelMessage, handler);
 		//EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
 		EventController::GetInstance()->AddEventHandler(EventType::RawKey, handler);
 		EventController::GetInstance()->AddEventHandler(EventType::SetView, handler);
@@ -49,11 +50,33 @@ namespace Atomic
 			switch (midiChannelMessageEvent.GetMidiChannelMessageEventId())
 			{
 				case MidiChannelMessageEventId::NoteOn:
+				{
+					TrackId trackId = NavigationController::GetInstance()->GetCurrentTrackId();
+					Serial.print("Current track is "); Serial.println(trackId);
+					TrackPlayer* trackPlayer = SongPlayer::GetInstance()->GetTrackPlayer(trackId);
+					myassert(trackPlayer);
+					//MidiSourceId mMidiSourceId;
+					//int mChannel;
+					uint8_t notenum = midiChannelMessageEvent.GetValue1();
+					uint8_t velocity = midiChannelMessageEvent.GetValue2();
+					trackPlayer->NoteOn(notenum, velocity);
+					msg("Note on: ", (int)notenum, ", velocity ", (int)velocity);
 					s = "N";
 					break;
+				}
 				case MidiChannelMessageEventId::NoteOff:
+				{
+					TrackId trackId = NavigationController::GetInstance()->GetCurrentTrackId();
+					Serial.print("Current track is "); Serial.println(trackId);
+					TrackPlayer* trackPlayer = SongPlayer::GetInstance()->GetTrackPlayer(trackId);
+					myassert(trackPlayer);
+					uint8_t notenum = midiChannelMessageEvent.GetValue1();
+					uint8_t velocity = midiChannelMessageEvent.GetValue2();
+					msg("Note off: ", (int)notenum, ", velocity ", (int)velocity);
+					trackPlayer->NoteOff(notenum, (uint8_t)0);
 					s = "O";
 					break;
+				}
 				case MidiChannelMessageEventId::ControlChange:
 					s = "C";
 					break;
