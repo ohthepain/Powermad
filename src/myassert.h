@@ -10,13 +10,13 @@ void write();
 void dowrite(const char* s);
 void dowrite(int i);
 template<typename Arg1, typename... Args>
-void write(const Arg1& arg1, const Args&&... args)
+void write(const Arg1 arg1, const Args&... args)
 {
 	dowrite(arg1);
 	write(args...);
 }
 template<typename Arg1, typename... Args>
-void write3(const char* s, int l, const Arg1& arg1, const Args&&... args)
+void write3(const char* s, int l, const Arg1 arg1, const Args&... args)
 {
 	dowrite(s);
 	dowrite(":");
@@ -45,7 +45,7 @@ void __attribute__((noreturn)) __my_assert_func(const char*, int, const char*, c
 # define myassert(__e) ((__e) ? (void)0 : __my_assert_func(__FILE__, __LINE__, #__e))
 # define myassertmsg(__e,__m) ((__e) ? (void)0 : __my_assert_func(__FILE__, __LINE__, #__e, __m))
 //# define msg(...) write(__VA_ARGS__)
-# define msg(...) write3(__FILE__, __LINE__, __VA_ARGS__)
+# define msg(...) Atomic::write3(__FILE__, __LINE__, __VA_ARGS__)
 #endif
 #ifdef __cplusplus
 }
