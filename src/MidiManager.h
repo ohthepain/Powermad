@@ -32,6 +32,30 @@ namespace Atomic
 		virtual void SendSystemReset() =0;
 	};
 
+	class MidiInput
+	{
+	public:
+		void HandleNoteOn(uint8_t channel, uint8_t note, uint8_t velocity);
+		void HandleNoteOff(uint8_t channel, uint8_t note, uint8_t velocity);
+		void HandleAfterTouchPoly(uint8_t channel, uint8_t note, uint8_t velocity);
+		void HandleControlChange(uint8_t channel, uint8_t control, uint8_t value);
+		void HandleProgramChange(uint8_t channel, uint8_t program);
+		void HandleAfterTouch(uint8_t channel, uint8_t pressure);
+		void HandlePitchChange(uint8_t channel, int pitch);
+		void HandleSystemExclusiveChunk(const uint8_t *data, uint16_t length, bool last);
+		void HandleSystemExclusive(uint8_t *data, unsigned int length);
+		void HandleTimeCodeQuarterFrame(uint8_t data);
+		void HandleSongPosition(uint16_t beats);
+		void HandleSongSelect(uint8_t songNumber);
+		void HandleTuneRequest();
+		void HandleClock();
+		void HandleStart();
+		void HandleContinue();
+		void HandleStop();
+		void HandleActiveSensing();
+		void HandleSystemReset();
+	};
+
 	#define NUM_MIDI_OUTPUTS 4
 
 	class MidiManager

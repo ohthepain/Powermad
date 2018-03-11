@@ -12,7 +12,7 @@ class EventController;
 
 namespace Atomic
 {
-	class UsbMidiController : public MidiOutput
+	class UsbMidiController : public MidiOutput, public MidiInput
 	{
 	public:
 		static void Init();
@@ -69,6 +69,7 @@ namespace Atomic
 		void HandleSystemReset();
 		void HandleRealTimeSystem(uint8_t realtimebyte);
 
+	private:
 		static void myNoteOn(uint8_t channel, uint8_t note, uint8_t velocity);
 		static void myNoteOff(uint8_t channel, uint8_t note, uint8_t velocity);
 		static void myAfterTouchPoly(uint8_t channel, uint8_t note, uint8_t velocity);
