@@ -38,10 +38,15 @@ namespace Atomic
         uint8_t mLength;
     };
 
+    class ValueList : public Vector<uint8_t>
+    {
+        virtual ~ValueList() {}
+    };
+
     class Arp
     {
     public:
-        Arp(ArpId arpId) : mArpId(arpId), mDivision(6) {}
+        Arp(ArpId arpId);
         virtual ~Arp() {}
 
         // 24 clocks in a quarter note
@@ -50,11 +55,17 @@ namespace Atomic
         void SetDivision(int division) { mDivision = division; }
         void SetGateId(GateId gateId) { mGateId = gateId; }
         GateId GetGateId() const { return mGateId; }
+        uint32_t GetLength() const { return mLength; }
+        void SetLength(uint32_t length) { mLength = length; }
+
+        uint8_t GetNote(int n);
 
     private:
         ArpId mArpId;
         GateId mGateId;
         uint8_t mDivision;
+        uint32_t mLength;
+        Vector<ValueList*> maValueList;
     };
 
     class Sequence
