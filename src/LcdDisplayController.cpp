@@ -40,14 +40,36 @@ namespace Atomic
 
 		mLiquidCrystal->begin(20,4);               // initialize the lcd 
 
-		mLiquidCrystal->createChar (0, smiley);    // load character to the LCD
-		mLiquidCrystal->createChar (1, armsUp);    // load character to the LCD
-		mLiquidCrystal->createChar (2, frownie);   // load character to the LCD
+		mLiquidCrystal->createChar(0, smiley);    // load character to the LCD
+		mLiquidCrystal->createChar(1, armsUp);    // load character to the LCD
+		mLiquidCrystal->createChar(2, frownie);   // load character to the LCD
 
-		mLiquidCrystal->home ();                   // go home
+		byte square[8] = { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b11111 };
+		mLiquidCrystal->createChar(1, square);
+		square[6] = 0b11111;
+		mLiquidCrystal->createChar(2, square);
+		square[5] = 0b11111;
+		mLiquidCrystal->createChar(3, square);
+		square[4] = 0b11111;
+		mLiquidCrystal->createChar(4, square);
+		square[3] = 0b11111;
+		mLiquidCrystal->createChar(5, square);
+		square[2] = 0b11111;
+		mLiquidCrystal->createChar(6, square);
+		square[1] = 0b11111;
+		mLiquidCrystal->createChar(7, square);
+		square[0] = 0b11111;
+		mLiquidCrystal->createChar(8, square);
+
+		for (int i=1; i<=8; i++)
+		{
+			mLiquidCrystal->setCursor(i, 3);
+			mLiquidCrystal->print((char)i);
+		}
+		mLiquidCrystal->home();                   // go home
 		mLiquidCrystal->print("Powermad Sequencer");  
-		mLiquidCrystal->setCursor ( 0, 1 );        // go to the next line
-		mLiquidCrystal->print ("Initializing ...");      
+		mLiquidCrystal->setCursor(30, 1);        // go to the next line
+		mLiquidCrystal->print("Initializing ...");
 	}
 
 	LcdDisplayController::~LcdDisplayController()

@@ -2,6 +2,7 @@
 
 #include "ArpViewLcd.h"
 #include "LcdDisplayController.h"
+#include "Song.h"
 #include <Arduino.h>
 
 namespace Atomic
@@ -29,14 +30,53 @@ namespace Atomic
 		EventController::GetInstance()->AddEventHandler(EventType::SetView, handler);
 	}
 
+	void ArpViewLcd::DrawBar(int n, uint8_t value)
+	{
+		msg("ArpViewLcd::DrawBar: ", n, ", note ", value);
+		LcdDisplayController* lcdDisplayController = LcdDisplayController::GetInstance();
+		int x = (n + 1) * 2;
+		int offset = (int)value;
+		if (offset > 36)
+		{
+			int val1 = std::min<int>(offset-36, 12);
+			val1 = (val1 * 2) / 3;
+			lcdDisplayController->WriteToScreen(x, 3, (char)val1);
+		}
+		if (offset > 48)
+		{
+			int val1 = std::min<int>(offset-24, 12);
+			val1 = (val1 * 2) / 3;
+			lcdDisplayController->WriteToScreen(x, 2, (char)val1);
+		}
+		if (offset > 60)
+		{
+			int val1 = std::min<int>(offset-24, 12);
+			val1 = (val1 * 2) / 3;
+			lcdDisplayController->WriteToScreen(x, 1, (char)val1);
+		}
+	}
+
+	void ArpViewLcd::Refresh()
+	{
+		LcdDisplayController* lcdDisplayController = LcdDisplayController::GetInstance();
+		lcdDisplayController->Clear();
+		lcdDisplayController->WriteToScreen(0, 0, "Arp");
+
+		int32_t length = mArp->GetLength();
+		msg("ArpViewLcd::Refresh: length ", length);
+		for (int32_t n=0; n<length; n++)
+		{
+			DrawBar(n, mArp->GetNote(n));
+		}
+	}
+
 	void ArpViewLcd::HandleActiveEvent(const Event& event)
 	{
 		LcdDisplayController* lcdDisplayController = LcdDisplayController::GetInstance();
 		switch (event.GetEventType())
 		{
 		case EventType::SetView:
-			lcdDisplayController->Clear();
-			lcdDisplayController->WriteToScreen(0, 0, "Arp");
+			Refresh();
 			break;
 		case EventType::MidiChannelMessage:
 		{

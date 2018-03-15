@@ -2,6 +2,8 @@
 
 #include "View.h"
 #include "NavigationController.h"
+// TODO: Refactor - should not need to include ArpViewLcd.h
+#include "ArpViewLcd.h"
 #include <Arduino.h>
 
 namespace Atomic
@@ -65,20 +67,28 @@ namespace Atomic
 		switch (keyPressEvent.GetKeyId())
 		{
 			case Event::Song:
+			{
 				Serial.println("NavigationController::HandleKeyPressEvent: Song");
 				static const SetViewEvent setViewSong(ViewId::Song);
 				EventController::GetInstance()->BroadcastEvent(setViewSong);
 				break;
+			}
 			case Event::Sequence:
 				Serial.println("NavigationController::HandleKeyPressEvent: Seq");
 				static const SetViewEvent setViewSeq(ViewId::Seq);
 				EventController::GetInstance()->BroadcastEvent(setViewSeq);
 				break;
 			case Event::Arp:
+			{
 				Serial.println("NavigationController::HandleKeyPressEvent: Arp");
+				Arp* arp = mCurrentSong->GetArp(0);
+				myassert(arp);
+				// TODO: Refactor - should not need to include ArpViewLcd.h
+				ArpViewLcd::GetInstance()->SetCurrentArp(arp);
 				static const SetViewEvent setViewArp(ViewId::Arp);
 				EventController::GetInstance()->BroadcastEvent(setViewArp);
 				break;
+			}
 			case Event::Gate:
 				Serial.println("NavigationController::HandleKeyPressEvent: Gate");
 				static const SetViewEvent setViewGate(ViewId::Gate);
