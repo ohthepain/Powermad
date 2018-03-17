@@ -30,11 +30,34 @@ namespace Atomic
 		EventController::GetInstance()->AddEventHandler(EventType::SetView, handler);
 	}
 
+	int translateColumn[] = { 2, 7, 12 };
+
+	void ArpViewLcd::SetCursor(int row, int column)
+	{
+		msg("ArpViewLcd::SetCursor: row: ", row, " column ", column);
+		LcdDisplayController* lcdDisplayController = LcdDisplayController::GetInstance();
+		switch (row)
+		{
+			case 0:
+			{
+				lcdDisplayController->SetCursor(column * 2 + 1, 3);
+				break;
+			}
+			case 1:
+			{
+				lcdDisplayController->SetCursor(translateColumn[column], 0);
+				break;
+			}
+			default:
+				msg("ArpViewLcd::SetCursor: Illegal row: ", row);
+		}
+	}
+
 	void ArpViewLcd::DrawBar(int n, uint8_t value)
 	{
 		msg("ArpViewLcd::DrawBar: ", n, ", note ", value);
 		LcdDisplayController* lcdDisplayController = LcdDisplayController::GetInstance();
-		int x = (n + 1) * 2;
+		int x = n * 2 + 1;
 		int offset = (int)value;
 		if (offset > 36)
 		{
@@ -60,7 +83,12 @@ namespace Atomic
 	{
 		LcdDisplayController* lcdDisplayController = LcdDisplayController::GetInstance();
 		lcdDisplayController->Clear();
-		lcdDisplayController->WriteToScreen(0, 0, "Arp");
+		lcdDisplayController->WriteToScreen(0, 0, "O:");
+		lcdDisplayController->WriteToScreen(translateColumn[0], 0, mArp->GetOctaves());
+		lcdDisplayController->WriteToScreen(5, 0, "P:");
+		lcdDisplayController->WriteToScreen(translateColumn[1], 0, (int)mArp->GetPatternId());
+		lcdDisplayController->WriteToScreen(10, 0, "L:");
+		lcdDisplayController->WriteToScreen(translateColumn[2], 0, (int)mArp->GetLength());
 
 		int32_t length = mArp->GetLength();
 		msg("ArpViewLcd::Refresh: length ", length);
@@ -68,6 +96,9 @@ namespace Atomic
 		{
 			DrawBar(n, mArp->GetNote(n));
 		}
+
+		lcdDisplayController->SetCursorEnabled(true);
+		SetCursor(1, 1);
 	}
 
 	void ArpViewLcd::HandleActiveEvent(const Event& event)

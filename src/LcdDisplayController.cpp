@@ -39,6 +39,7 @@ namespace Atomic
 		//analogWrite(CONTRAST_PIN, CONTRAST_PIN);
 
 		mLiquidCrystal->begin(20,4);               // initialize the lcd 
+		mLiquidCrystal->noCursor();
 
 		mLiquidCrystal->createChar(0, smiley);    // load character to the LCD
 		mLiquidCrystal->createChar(1, armsUp);    // load character to the LCD
@@ -63,13 +64,10 @@ namespace Atomic
 
 		for (int i=1; i<=8; i++)
 		{
-			mLiquidCrystal->setCursor(i, 3);
-			mLiquidCrystal->print((char)i);
+			WriteToScreen(i, 3, (char)i);
 		}
-		mLiquidCrystal->home();                   // go home
-		mLiquidCrystal->print("Powermad Sequencer");  
-		mLiquidCrystal->setCursor(30, 1);        // go to the next line
-		mLiquidCrystal->print("Initializing ...");
+		WriteToScreen(0, 0, "Powermad Sequencer");  
+		WriteToScreen(0, 1, "Initializing ...");
 	}
 
 	LcdDisplayController::~LcdDisplayController()
@@ -94,13 +92,11 @@ namespace Atomic
 		static bool dwit = false;
 		if (dwit)
 		{
-			mLiquidCrystal->setCursor(19, 3);
-			mLiquidCrystal->print(char(2));
+			WriteToScreen(19, 3, (char)0xDB);
 		}
 		else
 		{
-			mLiquidCrystal->setCursor(19, 3);
-			mLiquidCrystal->print(char(0));
+			WriteToScreen(19, 3, (char)0xA1);
 		}
 		dwit = !dwit;
 	}
@@ -109,18 +105,43 @@ namespace Atomic
 	{
 		mLiquidCrystal->setCursor(x, y);
 		mLiquidCrystal->print(s);
+		mLiquidCrystal->setCursor(mCursorColumn, mCursorRow);
 	}
 
 	void LcdDisplayController::WriteToScreen(int x, int y, int n)
 	{
 		mLiquidCrystal->setCursor(x, y);
 		mLiquidCrystal->print(n);
+		mLiquidCrystal->setCursor(mCursorColumn, mCursorRow);
 	}
 
 	void LcdDisplayController::WriteToScreen(int x, int y, char c)
 	{
 		mLiquidCrystal->setCursor(x, y);
 		mLiquidCrystal->print(c);
+		mLiquidCrystal->setCursor(mCursorColumn, mCursorRow);
+	}
+
+	void LcdDisplayController::SetCursorEnabled(bool enabled)
+	{
+		mCursorEnabled = enabled;
+		if (enabled)
+		{
+			mLiquidCrystal->blink();
+			mLiquidCrystal->cursor();
+		}
+		else
+		{
+			mLiquidCrystal->noCursor();
+		}
+	}
+
+	void LcdDisplayController::SetCursor(int x, int y)
+	{
+		mCursorColumn = x;
+		mCursorRow = y;
+		msg("LcdDisplayController::SetCursor: x: ", x, " y ", y);
+		mLiquidCrystal->setCursor(x, y);
 	}
 
 	void LcdDisplayController::Clear()

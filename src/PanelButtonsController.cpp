@@ -69,7 +69,7 @@ namespace Atomic
 		static bool shift = false;
 		const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
 
-		if (rawKeyEvent.GetKeyId() == Event::Shift)
+		if (rawKeyEvent.GetKeyId() == KeyId::Shift)
 		{
 			shift = !rawKeyEvent.GetUp();
 		}
@@ -110,7 +110,7 @@ namespace Atomic
 						//Serial.print("mSavedKeyState and keymask: "); Serial.print(mSavedKeyState & keymask); Serial.print(", keyState and keymask: "); Serial.println(keyState & keymask); 
 
 						bool up = (keyState & keymask) == 0;
-						RawKeyEvent rawKeyEvent((Event::KeyId)i, up);
+						RawKeyEvent rawKeyEvent((KeyId)i, up);
             EventController::GetInstance()->BroadcastEvent(rawKeyEvent);
           }
           keymask <<= 1;

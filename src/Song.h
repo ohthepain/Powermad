@@ -14,6 +14,8 @@ namespace Atomic
     typedef uint8_t PartId;
     typedef uint8_t MidiChannel;
     typedef uint16_t MidiSongPositionPointer;
+    typedef uint8_t value_t;
+    typedef size_t index_t;
 
     enum class ScaleId
     {
@@ -46,25 +48,51 @@ namespace Atomic
     class Arp
     {
     public:
+        enum class PatternId {
+            Up = 1,
+            Down,
+            UpDown,
+            Random,
+            Assign
+        };
+
+        enum class DestinationId {
+            Note=0,
+            Velocity,
+            AB,
+            MidiContinuousController,
+            Transpose,
+            Enable
+        };
+
         Arp(ArpId arpId);
         virtual ~Arp() {}
 
         // 24 clocks in a quarter note
         ArpId GetArpId() const { return mArpId; }
-        int GetDivision() const { return mDivision; }
         void SetDivision(int division) { mDivision = division; }
+        int GetDivision() const { return mDivision; }
         void SetGateId(GateId gateId) { mGateId = gateId; }
         GateId GetGateId() const { return mGateId; }
-        uint32_t GetLength() const { return mLength; }
         void SetLength(uint32_t length) { mLength = length; }
+        size_t GetLength() const { return mLength; }
+        void SetOctaves(value_t octaves) { mOctaves = octaves; }
+        value_t GetOctaves() const { return mOctaves; }
+        void SetPattern(PatternId patternId) { mPatternId = patternId; }
+        PatternId GetPatternId() const { return mPatternId; }
 
-        uint8_t GetNote(int n);
+        uint8_t SetValue(DestinationId destinationId, int slotnum, value_t value);
+        value_t GetValue(DestinationId destinationId, int slotnum) const;
+        value_t GetNote(int slotnum) const;
+        void SetNote(int slotnum, uint8_t notenum);
 
     private:
         ArpId mArpId;
         GateId mGateId;
         uint8_t mDivision;
         uint32_t mLength;
+        value_t mOctaves;
+        PatternId mPatternId;
         Vector<ValueList*> maValueList;
     };
 

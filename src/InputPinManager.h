@@ -8,15 +8,13 @@
 
 namespace Atomic
 {
-	typedef uint8_t tAnalogInputId;
-
 	typedef struct {
-		Event::KeyId keyId;
+		KeyId keyId;
 		uint8_t pinNumber;
 	} tPinToKeyAssigment;
 
 	typedef struct {
-		tAnalogInputId analogInputId;
+		AnalogInputId analogInputId;
 		uint8_t pinNumber;
 	} tPinToAnalogInputAssigment;
 
@@ -27,9 +25,9 @@ namespace Atomic
 		static void Shutdown();
 		static InputPinManager* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
-		void AddDigitalInputPin(int pinNumber, Event::KeyId rawButtonNumber);
-		void AddAnalogInputPin(int pinNumber, tAnalogInputId analogInputId);
-		float GetAnalogInputValue(tAnalogInputId analogInputId);
+		void AddDigitalInputPin(int pinNumber, KeyId rawButtonNumber);
+		void AddAnalogInputPin(int pinNumber, AnalogInputId analogInputId);
+		float ReadAnalogInputValue(AnalogInputId analogInputId);
 
 	private:
 		static InputPinManager* mInstance;
@@ -37,6 +35,8 @@ namespace Atomic
 		virtual ~InputPinManager();
 
 		void HandleMillisecondClock();
+		void HandleMidiSystemRealTimeMessage(const Event& event);
+		void HandleMidiTimingClock();
 
 		uint32_t mSavedKeyState;
 		uint32_t mTimeLastKeyStateChange;

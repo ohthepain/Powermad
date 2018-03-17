@@ -42,13 +42,13 @@ namespace Atomic
 		const KeyPressEvent& keyPressEvent = static_cast<const KeyPressEvent&>(event);
 		switch (keyPressEvent.GetKeyId())
 		{
-			case Event::Play:
+			case KeyId::Play:
 			{
 				static MidiSystemRealTimeMessage systemRealTimeMessage(MidiSystemRealTimeMessageId::Continue, MidiSourceId::Internal);
 				EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);
 				break;
 			}
-			case Event::Stop:
+			case KeyId::Stop:
 			{
 				static MidiSystemRealTimeMessage systemRealTimeMessage(MidiSystemRealTimeMessageId::Stop, MidiSourceId::Internal);
 				EventController::GetInstance()->BroadcastEvent(systemRealTimeMessage);

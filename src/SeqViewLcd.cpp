@@ -127,39 +127,39 @@ namespace Atomic
 		case EventType::RawKey:
 		{
 			const RawKeyEvent& rawKeyEvent = static_cast<const RawKeyEvent&>(event);
-			Serial.print("Seq Event: RawKey: "); Serial.print(rawKeyEvent.GetKeyId());
+			Serial.print("Seq Event: RawKey: "); Serial.print((int)rawKeyEvent.GetKeyId());
 			if (rawKeyEvent.GetUp())
 			{
 				Serial.print(" up");
 			}
 			Serial.println("");
-			int keyId = rawKeyEvent.GetKeyId();
+			KeyId keyId = rawKeyEvent.GetKeyId();
 			bool up = rawKeyEvent.GetUp();
 			int notenum = 0;
 			switch (keyId)
 			{
-				case Event::Note1:
+				case KeyId::Note1:
 					notenum = 60;
 					break;
-				case Event::Note2:
+				case KeyId::Note2:
 					notenum = 61;
 					break;
-				case Event::Note3:
+				case KeyId::Note3:
 					notenum = 62;
 					break;
-				case Event::Note4:
+				case KeyId::Note4:
 					notenum = 63;
 					break;
-				case Event::Note5:
+				case KeyId::Note5:
 					notenum = 64;
 					break;
-				case Event::Note6:
+				case KeyId::Note6:
 					notenum = 65;
 					break;
-				case Event::Note7:
+				case KeyId::Note7:
 					notenum = 66;
 					break;
-				case Event::Note8:
+				case KeyId::Note8:
 					notenum = 67;
 					break;
 				default:

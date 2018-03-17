@@ -19,52 +19,60 @@ namespace Atomic
 		SetView,
 		RawKey,
 		ArraySize,
+		JoystickAxis,
 	};
+
+	enum class AnalogInputId {
+		IllegalAnalogInput,
+		LeftJoystickX,
+		LeftJoystickY,
+		RightJoystickX,
+		RightJoystickY,
+		NumAnalogInputs,
+	};
+
+	enum class JoystickAxisId {
+		LeftX,
+		LeftY,
+		RightX,
+		RightY,
+	};
+
+	enum class KeyId {
+		Illegal = 0,
+		Sequence,
+		TopLeft,
+		Note6,
+		Note5,
+		Note4,
+		Note3,
+		Note2,
+		Note1,
+		Arp,
+		SecondFromTopLeft,
+		IdkLeft,
+		Release,
+		Attack,
+		Note7,
+		Shift,
+		Note8,
+		Gate,
+		Button18,
+		Button19,
+		B,
+		A,
+		Play,
+		Stop,
+		IdkRight,
+		Chase,
+		Song,
+		LeftJoystickButton,
+		RightJoystickButton,
+	};	
 
 	class Event
 	{
 	public:
-		typedef enum {
-			IllegalAnalogInput,
-			LeftJoystickX,
-			LeftJoystickY,
-			RightJoystickX,
-			RightJoystickY,
-			NumAnalogInputs,
-		} AnalogInputId;
-
-		typedef enum {
-			Illegal = 0,
-			Sequence,
-			TopLeft,
-			Note6,
-			Note5,
-			Note4,
-			Note3,
-			Note2,
-			Note1,
-			Arp,
-			SecondFromTopLeft,
-			IdkLeft,
-			Release,
-			Attack,
-			Note7,
-			Shift,
-			Note8,
-			Gate,
-			Button18,
-			Button19,
-			B,
-			A,
-			Play,
-			Stop,
-			IdkRight,
-			Chase,
-			Song,
-			LeftJoystickButton,
-			RightJoystickButton,
-		} KeyId;
-			
 		typedef enum {
 			PriorityMax = 0,
 			High = 10,
@@ -76,6 +84,24 @@ namespace Atomic
 		virtual ~Event() {}
 
 		virtual EventType GetEventType() const = 0;
+	};
+
+	class JoystickAxisEvent : public Event
+	{
+	public:
+		JoystickAxisEvent(JoystickAxisId joystickAxisId, int value, size_t divisor) 
+			: mJoystickAxisId(joystickAxisId), mValue(value), mDivisor(divisor) {}
+		virtual ~JoystickAxisEvent() {}
+
+		EventType GetEventType() const { return EventType::JoystickAxis; }
+		JoystickAxisId GetJoystickAxisId() const { return mJoystickAxisId; }
+		int GetValue() const { return mValue; }
+		size_t GetDivistor() const { return mDivisor; }
+		
+	private:
+		JoystickAxisId mJoystickAxisId;
+		int mValue;
+		uint32_t mDivisor;
 	};
 
 	class SecondClockEvent : public Event

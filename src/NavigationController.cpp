@@ -49,7 +49,13 @@ namespace Atomic
 		for (int i=0; i<kNumTracksDefault; i++)
 		{
 			song->AddGate(new Gate(i));
-			song->AddArp(new Arp(i));
+
+			Arp* arp = new Arp(i);
+			arp->SetLength(8);
+			arp->SetPattern(Arp::PatternId::Up);
+			arp->SetOctaves(1);
+			song->AddArp(arp);
+
 			song->AddSequence(new Sequence(i));
 			song->AddTrack(new Track(i));
 
@@ -66,19 +72,19 @@ namespace Atomic
 		const KeyPressEvent& keyPressEvent = static_cast<const KeyPressEvent&>(event);
 		switch (keyPressEvent.GetKeyId())
 		{
-			case Event::Song:
+			case KeyId::Song:
 			{
 				Serial.println("NavigationController::HandleKeyPressEvent: Song");
 				static const SetViewEvent setViewSong(ViewId::Song);
 				EventController::GetInstance()->BroadcastEvent(setViewSong);
 				break;
 			}
-			case Event::Sequence:
+			case KeyId::Sequence:
 				Serial.println("NavigationController::HandleKeyPressEvent: Seq");
 				static const SetViewEvent setViewSeq(ViewId::Seq);
 				EventController::GetInstance()->BroadcastEvent(setViewSeq);
 				break;
-			case Event::Arp:
+			case KeyId::Arp:
 			{
 				Serial.println("NavigationController::HandleKeyPressEvent: Arp");
 				Arp* arp = mCurrentSong->GetArp(0);
@@ -89,7 +95,7 @@ namespace Atomic
 				EventController::GetInstance()->BroadcastEvent(setViewArp);
 				break;
 			}
-			case Event::Gate:
+			case KeyId::Gate:
 				Serial.println("NavigationController::HandleKeyPressEvent: Gate");
 				static const SetViewEvent setViewGate(ViewId::Gate);
 				EventController::GetInstance()->BroadcastEvent(setViewGate);

@@ -35,12 +35,24 @@ namespace Atomic
 		maValueList.Add(valueList);
 	}
 
-	uint8_t Arp::GetNote(int n)
+	uint8_t Arp::GetNote(int n) const
 	{
-		myassert(n < GetLength());
+		myassert((size_t)n < GetLength());
 		const ValueList& valueList = *(maValueList[0]);
 		uint8_t note = valueList[n];
 		return note;
+	}
+
+	value_t Arp::GetValue(DestinationId destinationId, int slotnum) const
+	{
+		myassert((size_t)destinationId < maValueList.GetSize());
+		const ValueList* valueList = maValueList[(int)destinationId];
+		return (*valueList)[slotnum];
+	}
+
+	void Arp::SetNote(int slotnum, uint8_t notenum)
+	{
+		SetValue(DestinationId::Note, slotnum, notenum);
 	}
 
     Arp* Song::GetArp(ArpId arpId) const

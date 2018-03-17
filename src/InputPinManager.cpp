@@ -42,7 +42,7 @@ namespace Atomic
 		mInstance = nullptr;
 	}
 
-	void InputPinManager::AddDigitalInputPin(int pinNumber, Event::KeyId rawButtonNumber)
+	void InputPinManager::AddDigitalInputPin(int pinNumber, KeyId rawButtonNumber)
 	{
 		myassert(mNumPinToKeyAssigments < kMaxPinToKeyAssignments);
 		mPinToKeyAssignments[mNumPinToKeyAssigments].pinNumber = pinNumber;
@@ -52,7 +52,7 @@ namespace Atomic
 		pinMode(pinNumber, INPUT_PULLUP);
 	}
 
-	void InputPinManager::AddAnalogInputPin(int pinNumber, tAnalogInputId analogInputId)
+	void InputPinManager::AddAnalogInputPin(int pinNumber, AnalogInputId analogInputId)
 	{
 		myassert(mNumPinToAnalogInputAssigments < kMaxPinToAnalogInputAssignments);
 		mPinToAnalogInputAssigments[mNumPinToAnalogInputAssigments].pinNumber = pinNumber;
@@ -62,7 +62,7 @@ namespace Atomic
 		pinMode(pinNumber, INPUT);
 	}
 
-	float InputPinManager::GetAnalogInputValue(tAnalogInputId analogInputId)
+	float InputPinManager::ReadAnalogInputValue(AnalogInputId analogInputId)
 	{
 		for (size_t n=0; n<mNumPinToAnalogInputAssigments; n++)
 		{

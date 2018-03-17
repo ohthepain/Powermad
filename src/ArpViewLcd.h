@@ -32,6 +32,11 @@ namespace Atomic
 		virtual void HandleActiveEvent(const Event& event);
 		void HandleMidiClock();
 
+		void SetCursor(int row, int column);
+
 		Arp* mArp;
+		int mCurrentRow;
+		int mCurrentColumn;
+		int mCurrentPage;
 	};
 }

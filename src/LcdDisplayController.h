@@ -15,6 +15,8 @@ namespace Atomic
 			static void Shutdown();
 			static LcdDisplayController* GetInstance() { myassert(mInstance != nullptr); return mInstance; }
 
+			void SetCursorEnabled(bool enabled);
+			void SetCursor(int x, int y);
 			void WriteToScreen(int x, int y, const char* string);
 			void WriteToScreen(int x, int y, int n);
 			void WriteToScreen(int x, int y, char c);
@@ -28,5 +30,8 @@ namespace Atomic
 
 			static LcdDisplayController* mInstance;
 			LiquidCrystal* mLiquidCrystal;
+			bool mCursorEnabled;
+			int mCursorColumn;
+			int mCursorRow;
 	};
 }
