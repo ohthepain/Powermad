@@ -33,6 +33,26 @@ extern "C" {
 #include <lua-5.3.4/src/lualib.h>
 }
 
+#include "lua-5.3.4/src/luapluscd.h"
+
+#define ScriptRegisterMemberDirect(state,name,ptr,directfunctor) \
+{ \
+  assert(ptr != nullptr); \
+  lua_pushdirectclosure(state, *ptr, &directfunctor); \
+  lua_setglobal(state, name); \
+}
+
+#define ScriptRegisterDirect(state,name,directfunctor) \
+{ \
+  lua_pushdirectclosure(state, directfunctor, 0); \
+  lua_setglobal(state, name); \
+}
+
+int spankmesilly(int n)
+{
+  msg("spankmesilly: ", n);
+}
+
 std::vector<int> myvectorofint;
 
 #define LED 13
@@ -43,24 +63,21 @@ extern "C" {
     //myassert(false);
     return 0;
   }
+
+  #include <sys/time.h>
+
+  int _gettimeofday( struct timeval *tv, void *tzvp )
+  {
+      tv->tv_usec = micros();  // get remaining microseconds
+      tv->tv_sec = tv->tv_usec / 1000000;  // convert to seconds
+      return 0;  // return non-zero for error
+  }  
 }
+
+lua_State* L = nullptr;
 
 void setup()
 {
-  myvectorofint[0] = 5000;
-  printf("that rocks %d fimes", 5);
-
-  //lua_State *L = lua_open();
-    lua_State* L = luaL_newstate(); 
-     
-    luaL_dostring(L, "a = 10 + 5"); 
-    lua_getglobal(L, "a"); 
-    int i = lua_tointeger(L, -1); 
-    printf("%d\n", i); 
-     
-    lua_close(L); 
-
-
   Atomic::EventController::Init();
   Atomic::EventMonitor::Init();
   Atomic::PanelButtonsController::Init();
@@ -96,10 +113,23 @@ void setup()
   Atomic::NavigationController::GetInstance()->CreateSong();
 
   Atomic::SongPositionManager::Init();
+
+  L = luaL_newstate(); 
+  //lua_close(L); 
+
+  ScriptRegisterDirect(L, "dospank", spankmesilly);
 }
 
 void loop()
 {
+  delay(1000);
+  msg(5);
+
+  luaL_dostring(L, "a = 10 + 5"); 
+  lua_getglobal(L, "a"); 
+  int i = lua_tointeger(L, -1); 
+  msg("i is ", i);
+  luaL_dostring(L, "i = 11 dospank(i)");
 }
 
 int main()
