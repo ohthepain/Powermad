@@ -8,6 +8,31 @@
 
 namespace Atomic
 {
+	enum class JoystickAxisId {
+		LeftX,
+		LeftY,
+		RightX,
+		RightY,
+	};
+
+	class JoystickAxisEvent : public Event
+	{
+	public:
+		JoystickAxisEvent(JoystickAxisId joystickAxisId, int value, size_t divisor) 
+			: mJoystickAxisId(joystickAxisId), mValue(value), mDivisor(divisor) {}
+		virtual ~JoystickAxisEvent() {}
+
+		EventType GetEventType() const { return EventType::JoystickAxis; }
+		JoystickAxisId GetJoystickAxisId() const { return mJoystickAxisId; }
+		int GetValue() const { return mValue; }
+		size_t GetDivisor() const { return mDivisor; }
+		
+	private:
+		JoystickAxisId mJoystickAxisId;
+		int mValue;
+		uint32_t mDivisor;
+	};
+
 	class JoystickManager
 	{
 	public:
@@ -21,7 +46,8 @@ namespace Atomic
 		typedef struct {
 			JoystickAxisId joystickAxisId;
 			AnalogInputId analogInputId;
-			uint32_t lastMessageTime;
+			int centerValue;
+			uint32_t lastMessageTime[4];
 		} tJoystick;
 
 		Vector<tJoystick> mJoysticks;

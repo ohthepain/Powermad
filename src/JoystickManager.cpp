@@ -4,6 +4,7 @@
 #include "MidiEvent.h"
 #include "InputPinManager.h"
 #include "SongPositionManager.h"
+#include "UserMessage.h"
 #include <Arduino.h>
 
 namespace Atomic
@@ -35,13 +36,19 @@ namespace Atomic
 
 	void JoystickManager::AddJoytickAxis(JoystickAxisId joystickAxisId, AnalogInputId analogInputId)
 	{
-		mJoysticks.Add({joystickAxisId, analogInputId});
+		int centerVal = InputPinManager::GetInstance()->ReadAnalogInputValue(analogInputId);
+		/*while (centerVal > 512 + 50 || centerVal < 512 - 50)
+		{
+			WarnUser("Initialization Error:", "Please release joysticks or recalibrate");
+			delay(500);
+		}*/
+		mJoysticks.Add({joystickAxisId, analogInputId, centerVal, 0});
+		msg("center value ", centerVal);
 	}
 
 	const size_t kNumInflectionPoints = 8;
 	uint inflectionPoint[kNumInflectionPoints] = { 1000, 10, 700, 300, 580, 80, 550, 450, };
-	uint divisor[kNumInflectionPoints] =         { 4,  4,  8,  8,   16,   16,   32,   32, };
-	uint centerVal = 512;
+	uint divisor[kNumInflectionPoints] =         { 6, 6, 12, 12, 24, 24, 48, 48, };
 
 	void JoystickManager::CheckJoystickAxis(size_t n)
 	{
@@ -53,12 +60,12 @@ namespace Atomic
 		uint value = InputPinManager::GetInstance()->ReadAnalogInputValue(analogInputId);
 		for (pointnum=0; pointnum<kNumInflectionPoints; pointnum++)
 		{
-			uint point = inflectionPoint[pointnum];
-			if (point > centerVal && value >= point)
+			int point = inflectionPoint[pointnum];
+			if (point > joystick.centerValue && value >= point)
 			{
 				goto send_event;
 			}
-			if (point < centerVal && value <= point)
+			if (point < joystick.centerValue && value <= point)
 			{
 				goto send_event;
 			}
@@ -66,11 +73,15 @@ namespace Atomic
 		return;
 
 	send_event:
-		if (songTime - joystick.lastMessageTime > divisor[pointnum])
+		if (songTime - joystick.lastMessageTime[n] > divisor[pointnum])
 		{
-			joystick.lastMessageTime = songTime;
+			if (n == 1)
+			{
+				//msg("songTime ", songTime, " last msg time ", joystick.lastMessageTime[n], " point ", pointnum, " divisor ", divisor[pointnum]);
+			}
+			joystick.lastMessageTime[n] = songTime;
 			//msg("CheckJoystickAxis - send event: n ", n, " value ", value);
-			JoystickAxisEvent joystickAxisEvent(joystick.joystickAxisId, value, divisor[n]);
+			JoystickAxisEvent joystickAxisEvent(joystick.joystickAxisId, value, divisor[pointnum]);
 			EventController::GetInstance()->BroadcastEvent(joystickAxisEvent);
 		}
 	}

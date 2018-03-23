@@ -10,7 +10,7 @@
 namespace Atomic
 {
 	enum class EventType {
-		MillisecondClock,
+		MillisecondClock = 1,
 		SecondClock,
 		MidiChannelMessage,
 		MidiSystemRealTimeMessage,
@@ -18,8 +18,9 @@ namespace Atomic
 		KeyPress,
 		SetView,
 		RawKey,
-		ArraySize,
 		JoystickAxis,
+		// ------------
+		ArraySize,
 	};
 
 	enum class AnalogInputId {
@@ -29,13 +30,6 @@ namespace Atomic
 		RightJoystickX,
 		RightJoystickY,
 		NumAnalogInputs,
-	};
-
-	enum class JoystickAxisId {
-		LeftX,
-		LeftY,
-		RightX,
-		RightY,
 	};
 
 	enum class KeyId {
@@ -73,35 +67,10 @@ namespace Atomic
 	class Event
 	{
 	public:
-		typedef enum {
-			PriorityMax = 0,
-			High = 10,
-			Medium = 100,
-			Low = 1000,
-		} Priority;
-
 		Event() {}
 		virtual ~Event() {}
 
 		virtual EventType GetEventType() const = 0;
-	};
-
-	class JoystickAxisEvent : public Event
-	{
-	public:
-		JoystickAxisEvent(JoystickAxisId joystickAxisId, int value, size_t divisor) 
-			: mJoystickAxisId(joystickAxisId), mValue(value), mDivisor(divisor) {}
-		virtual ~JoystickAxisEvent() {}
-
-		EventType GetEventType() const { return EventType::JoystickAxis; }
-		JoystickAxisId GetJoystickAxisId() const { return mJoystickAxisId; }
-		int GetValue() const { return mValue; }
-		size_t GetDivistor() const { return mDivisor; }
-		
-	private:
-		JoystickAxisId mJoystickAxisId;
-		int mValue;
-		uint32_t mDivisor;
 	};
 
 	class SecondClockEvent : public Event

@@ -25,6 +25,7 @@
 #include <Arduino.h>
 #include "myassert.h"
 #include <setjmp.h> 
+//#include <notused.h>
 
 #include <vector>
 extern "C" {
@@ -51,6 +52,7 @@ extern "C" {
 int spankmesilly(int n)
 {
   msg("spankmesilly: ", n);
+  return n;
 }
 
 std::vector<int> myvectorofint;
@@ -72,6 +74,11 @@ extern "C" {
       tv->tv_sec = tv->tv_usec / 1000000;  // convert to seconds
       return 0;  // return non-zero for error
   }  
+
+  #include <sys/times.h>
+  clock_t _times(struct tms* tms) {
+    return (clock_t)-1;
+  }
 }
 
 lua_State* L = nullptr;
@@ -116,13 +123,18 @@ void setup()
 
   L = luaL_newstate(); 
   //lua_close(L); 
+  luaopen_base(L);             /* opens the basic library */
+  luaopen_table(L);            /* opens the table library */
+  //luaopen_io(L);               /* opens the I/O library */
+  luaopen_string(L);           /* opens the string lib. */
+  luaopen_math(L);             /* opens the math lib. */
 
   ScriptRegisterDirect(L, "dospank", spankmesilly);
 }
 
 void loop()
 {
-  delay(1000);
+  delay(500);
   msg(5);
 
   luaL_dostring(L, "a = 10 + 5"); 

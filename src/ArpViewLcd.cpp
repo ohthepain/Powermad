@@ -3,6 +3,7 @@
 #include "ArpViewLcd.h"
 #include "LcdDisplayController.h"
 #include "Song.h"
+#include "JoystickManager.h"
 #include <Arduino.h>
 
 namespace Atomic
@@ -23,11 +24,13 @@ namespace Atomic
 	}
 
 	ArpViewLcd::ArpViewLcd()
+	: mKludgeyLastDivisor(0)
 	{
 		EventController::EventHandler handler = [&](const Event& event) { this->HandleEvent(event); return 0; };
 		EventController::GetInstance()->AddEventHandler(EventType::MidiSystemRealTimeMessage, handler);
 		EventController::GetInstance()->AddEventHandler(EventType::KeyPress, handler);
 		EventController::GetInstance()->AddEventHandler(EventType::SetView, handler);
+		EventController::GetInstance()->AddEventHandler(EventType::JoystickAxis, handler);
 	}
 
 	int translateColumn[] = { 2, 7, 12 };
@@ -40,7 +43,7 @@ namespace Atomic
 		{
 			case 0:
 			{
-				lcdDisplayController->SetCursor(column * 2 + 1, 3);
+				lcdDisplayController->SetCursor(column * 2 /*+ 1*/, 3);
 				break;
 			}
 			case 1:
@@ -109,6 +112,48 @@ namespace Atomic
 		case EventType::SetView:
 			Refresh();
 			break;
+		case EventType::JoystickAxis:
+		{
+			const JoystickAxisEvent& joystickAxisEvent = static_cast<const JoystickAxisEvent&>(event);
+			uint32_t divisor = joystickAxisEvent.GetDivisor();
+			msg("JoystickAxis - divisor ", (int)divisor);
+			if (divisor <= 6 && mKludgeyLastDivisor > 6)
+			{
+				if (joystickAxisEvent.GetJoystickAxisId() == JoystickAxisId::LeftY)
+				{
+					if (joystickAxisEvent.GetValue() > 512)
+					{
+			msg("JoystickAxis up");
+						++mCurrentRow;
+					}
+					else if (joystickAxisEvent.GetValue() < 512)
+					{
+			msg("JoystickAxis down");
+						--mCurrentRow;
+					}
+				}
+				else if (joystickAxisEvent.GetJoystickAxisId() == JoystickAxisId::LeftX)
+				{
+					if (joystickAxisEvent.GetValue() > 512)
+					{
+			msg("JoystickAxis right");
+						++mCurrentColumn;
+					}
+					else if (joystickAxisEvent.GetValue() < 512)
+					{
+			msg("JoystickAxis left");
+						--mCurrentColumn;
+					}
+				}
+				mCurrentRow = std::min<int>(mCurrentRow, 1);
+				mCurrentRow = std::max<int>(mCurrentRow, 0);
+				int max = mCurrentRow == 1 ? 3 : 8;
+				mCurrentColumn = std::min<int>(mCurrentColumn, max);
+				mCurrentColumn = std::max<int>(mCurrentColumn, 0);
+				SetCursor(mCurrentRow, mCurrentColumn);
+			}
+			mKludgeyLastDivisor = divisor;
+		}
 		case EventType::MidiChannelMessage:
 		{
 			const MidiChannelMessageEvent& midiChannelMessageEvent = static_cast<const MidiChannelMessageEvent&>(event);
