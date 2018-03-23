@@ -207,6 +207,7 @@ namespace Atomic
 
 	void SongPlayer::HandleMidiSystemRealTimeMessage(const Event& event)
 	{
+		myassert(event.GetEventType() == EventType::MidiSystemRealTimeMessage);
 		const MidiSystemRealTimeMessage& midiSystemRealTimeMessage = static_cast<const MidiSystemRealTimeMessage&>(event);
 		switch (midiSystemRealTimeMessage.GetSystemRealTimeMessageId())
 		{
@@ -223,10 +224,10 @@ namespace Atomic
 				Stop();
 				break;
 			case MidiSystemRealTimeMessageId::ActiveSensing:
-				myassertmsg(false, "Unexpected MidiSystemRealTimeMessageId::ActiveSensing");
+				myassertmsg(false, "Unexpected ActiveSensing");
 				break;
 			case MidiSystemRealTimeMessageId::SystemReset:
-				myassertmsg(false, "Unexpected MidiSystemRealTimeMessageId::SystemReset");
+				myassertmsg(false, "Unexpected SystemReset");
 				break;
 			default:
 				myassertmsg(false, "Illegal MidiSystemRealTimeMessageId");
