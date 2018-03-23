@@ -38,5 +38,7 @@ namespace Atomic
 		int mCurrentRow;
 		int mCurrentColumn;
 		int mCurrentPage;
+		// Used to detect taps
+		uint32_t mKludgeyLastDivisor;
 	};
 }
